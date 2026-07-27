@@ -9,5 +9,5 @@ export const siteConfig = {
   city: "Nova Serrana",
   state: "MG",
   locale: "pt_BR",
-  url: "https://www.jrfilm.com.br",
+  url: "https://jrfilm-site.vercel.app",
 } as const;
