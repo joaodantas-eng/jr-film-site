@@ -3,6 +3,8 @@ import { Archivo, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/data/site";
 import { seoDefaults } from "@/config/seo";
+import { contactInfo } from "@/data/contact";
+import { socialLinks } from "@/data/social";
 
 const archivo = Archivo({
   subsets: ["latin"],
@@ -55,12 +57,30 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     name: siteConfig.legalName,
     description: siteConfig.description,
     url: siteConfig.url,
+    telephone: contactInfo.phoneRaw,
     address: {
       "@type": "PostalAddress",
+      streetAddress: contactInfo.address.street,
       addressLocality: siteConfig.city,
       addressRegion: siteConfig.state,
+      postalCode: contactInfo.address.zip,
       addressCountry: "BR",
     },
+    openingHoursSpecification: [
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        opens: "07:00",
+        closes: "17:30",
+      },
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: ["Saturday"],
+        opens: "08:00",
+        closes: "12:00",
+      },
+    ],
+    sameAs: socialLinks.map((social) => social.href),
   };
 
   return (

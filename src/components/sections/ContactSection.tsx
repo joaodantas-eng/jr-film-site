@@ -1,8 +1,10 @@
 import { contactInfo } from "@/data/contact";
+import { socialLinks } from "@/data/social";
 import { SectionContainer } from "@/components/ui/SectionContainer";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { WhatsAppButton } from "@/components/buttons/WhatsAppButton";
 import { Button } from "@/components/ui/Button";
+import { Icon } from "@/components/ui/Icon";
 import { Phone, MapPin, Clock } from "lucide-react";
 import { Reveal } from "@/components/animations/Reveal";
 
@@ -50,6 +52,21 @@ export function ContactSection() {
             <Button href={contactInfo.mapDirectionsUrl} target="_blank" rel="noopener noreferrer" variant="secondary" size="lg">
               Como chegar
             </Button>
+          </div>
+
+          <div className="mt-8 flex gap-3">
+            {socialLinks.map((social) => (
+              <a
+                key={social.id}
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={social.label}
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-muted transition-colors hover:border-accent hover:text-accent"
+              >
+                <Icon name={social.icon} className="h-4 w-4" />
+              </a>
+            ))}
           </div>
         </Reveal>
 

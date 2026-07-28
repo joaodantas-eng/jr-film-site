@@ -10,11 +10,17 @@ import { useActiveSection } from "@/hooks/useActiveSection";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Menu, Phone } from "lucide-react";
+import Link from "next/link";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const activeId = useActiveSection(mainNav.map((l) => l.href.replace("#", "")));
+  const activeId = useActiveSection(
+    mainNav
+      .filter((l) => l.href.includes("#"))
+      .map((l) => l.href.split("#")[1])
+      .filter((fragment): fragment is string => Boolean(fragment)),
+  );
 
   useEffect(() => {
     function onScroll() {
@@ -34,9 +40,9 @@ export function Navbar() {
       }`}
     >
       <div className="mx-auto flex h-20 max-w-container items-center justify-between px-6 md:px-10">
-        <a href="#top" aria-label={`${contactInfo.address.city} — Página inicial`}>
+        <Link href="/" aria-label={`${contactInfo.address.city} — Página inicial`}>
           <Logo variant="dark-bg" height={30} />
-        </a>
+        </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
           <NavLinks links={mainNav} activeId={activeId} />

@@ -1,12 +1,27 @@
 // Contratos centrais do projeto.
 // Componentes dependem apenas destes tipos — nunca da origem do dado (arquivo estático hoje, API amanhã).
 
+export interface FAQItem {
+  id: string;
+  question: string;
+  answer: string;
+}
+
 export interface Service {
   id: string;
   slug: string;
   title: string;
   description: string;
   icon: LucideIconName;
+  // Campos abaixo alimentam a página individual do serviço (app/servicos/[slug]).
+  // Opcionais para não quebrar nenhum componente da V1 que só usa os campos básicos.
+  metaDescription?: string;
+  longDescription?: string;
+  benefits?: string[];
+  symptoms?: string[];
+  whenToDo?: string;
+  process?: { title: string; description: string }[];
+  faq?: FAQItem[];
 }
 
 export interface Differentiator {
@@ -30,6 +45,32 @@ export interface GalleryItem {
   alt: string;
   category: "oficina" | "servicos" | "equipe" | "resultados";
   src: string;
+}
+
+export interface Promotion {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  image: string;
+  validUntil: string;
+  active: boolean;
+}
+
+export interface BlogPost {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  content: string[];
+  publishedAt: string;
+  coverImage: string;
+  relatedServiceSlugs?: string[];
+}
+
+export interface Brand {
+  id: string;
+  name: string;
 }
 
 export interface NavLink {
@@ -86,4 +127,14 @@ export type LucideIconName =
   | "ChevronRight"
   | "Menu"
   | "X"
-  | "ArrowUpRight";
+  | "ArrowUpRight"
+  | "Link2"
+  | "CheckCircle2"
+  | "HelpCircle"
+  | "Calendar"
+  | "ClipboardList"
+  | "CarFront"
+  | "Tag"
+  | "BookOpen"
+  | "ChevronDown"
+  | "Home";

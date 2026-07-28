@@ -14,7 +14,8 @@ export function NavLinks({ links, activeId, onClickLink, className }: NavLinksPr
   return (
     <>
       {links.map((link) => {
-        const isActive = activeId === link.href.replace("#", "");
+        const fragment = link.href.includes("#") ? link.href.split("#")[1] : null;
+        const isActive = fragment !== null && activeId === fragment;
         return (
           <a
             key={link.id}

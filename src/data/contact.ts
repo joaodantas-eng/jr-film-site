@@ -1,8 +1,8 @@
 import { ContactInfo } from "@/types";
 
 export const contactInfo: ContactInfo = {
-  phoneDisplay: "(37) 3225-4326",
-  phoneRaw: "553732254326",
+  phoneDisplay: "(37) 3222-0000",
+  phoneRaw: "553732220000",
   whatsappNumber: "5537991124115",
   address: {
     street: "Av. Dom Cabral, 140",

@@ -24,6 +24,16 @@ import {
   Menu,
   X,
   ArrowUpRight,
+  Link2,
+  CheckCircle2,
+  HelpCircle,
+  Calendar,
+  ClipboardList,
+  CarFront,
+  Tag,
+  BookOpen,
+  ChevronDown,
+  Home,
   LucideProps,
 } from "lucide-react";
 
@@ -55,6 +65,16 @@ const iconMap: Record<LucideIconName, React.ComponentType<LucideProps>> = {
   Menu,
   X,
   ArrowUpRight,
+  Link2,
+  CheckCircle2,
+  HelpCircle,
+  Calendar,
+  ClipboardList,
+  CarFront,
+  Tag,
+  BookOpen,
+  ChevronDown,
+  Home,
 };
 
 interface IconProps extends LucideProps {
