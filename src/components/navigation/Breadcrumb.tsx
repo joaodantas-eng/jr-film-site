@@ -12,7 +12,7 @@ interface BreadcrumbProps {
 }
 
 // Breadcrumb visual + Schema.org BreadcrumbList (SEO). Usado nas páginas de
-// serviço, blog e promoções — qualquer página futura pode reaproveitar.
+// serviço e promoções — qualquer página futura pode reaproveitar.
 export function Breadcrumb({ items }: BreadcrumbProps) {
   const jsonLd = {
     "@context": "https://schema.org",

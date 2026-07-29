@@ -5,21 +5,22 @@ import { Promotion } from "@/types";
 export const promotions: Promotion[] = [
   {
     id: "promo-1",
-    slug: "revisao-de-freios",
-    title: "Revisão de Freios com Desconto",
-    description:
-      "Inspeção completa do sistema de freios (pastilhas, discos e fluido) com condição especial neste mês.",
-    image: "/images/gallery/img_1310.jpg",
-    validUntil: "Consulte a validade pelo WhatsApp",
+    slug: "combo-fiat-1-0-e-1-4",
+    title: "Combo Especial Fiat 1.0 e 1.4",
+    description: "Troca de óleo + filtro",
+    image: "/images/gallery/img_3606.jpg",
+    price: "R$ 135,00",
     active: true,
   },
   {
     id: "promo-2",
-    slug: "combo-alinhamento-balanceamento",
-    title: "Combo Alinhamento + Balanceamento",
-    description: "Faça os dois serviços juntos e garanta mais estabilidade e economia de pneus.",
+    slug: "oferta-especial-de-pneus",
+    title: "Oferta Especial de Pneus",
+    description: "Pneus selecionados com condição especial:",
+    details: ["175/75 R13", "175/70 R14"],
     image: "/images/gallery/img_3682.jpg",
-    validUntil: "Consulte a validade pelo WhatsApp",
+    price: "R$ 279,00",
+    oldPrice: "R$ 299,00",
     active: true,
   },
 ];

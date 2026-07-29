@@ -52,25 +52,12 @@ export interface Promotion {
   slug: string;
   title: string;
   description: string;
+  details?: string[]; // itens extras da oferta (ex: medidas de pneu)
   image: string;
-  validUntil: string;
+  price: string;
+  oldPrice?: string;
+  validUntil?: string;
   active: boolean;
-}
-
-export interface BlogPost {
-  id: string;
-  slug: string;
-  title: string;
-  excerpt: string;
-  content: string[];
-  publishedAt: string;
-  coverImage: string;
-  relatedServiceSlugs?: string[];
-}
-
-export interface Brand {
-  id: string;
-  name: string;
 }
 
 export interface NavLink {
