@@ -16,7 +16,7 @@
     "lucide-react": "^0.454.0",
     "clsx": "^2.1.1",
     "tailwind-merge": "^2.5.4",
-    "@google/genai": "^2.14.0",
+    "@google/genai": "^2.15.0",
     "server-only": "^0.0.1"
   },
   "devDependencies": {

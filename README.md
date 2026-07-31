@@ -38,7 +38,7 @@ A partir daí, `/diagnostico` (modo "Descrever o problema") passa a responder
 com o Gemini. **Nunca coloque a chave em `data/` ou em qualquer arquivo commitado**
 — `.env.local` já está no `.gitignore`.
 
-Se quiser trocar o modelo padrão (`gemini-2.5-flash`), defina `GEMINI_MODEL`
+Se quiser trocar o modelo padrão (`gemini-3.6-flash`), defina `GEMINI_MODEL`
 no mesmo arquivo.
 
 ## Onde editar conteúdo

@@ -1,5 +1,5 @@
 import "server-only";
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, ThinkingLevel } from "@google/genai";
 import { AIProvider, AssistantAnswer, AssistantContext, AssistantMessage } from "../../types";
 import { buildSystemPrompt } from "../../prompts/systemPrompt";
 import { ASSISTANT_WARNING, ASSISTANT_CLOSING_NOTE_FALLBACK } from "../../prompts/constants";
@@ -11,7 +11,11 @@ import { services } from "@/data/services";
 // É a segunda camada de proteção da chave (a primeira é: só a Route Handler
 // de /api/assistant chama a camada de IA).
 
-const MODEL_NAME = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+// Modelo padrão: Gemini 3.6 Flash — GA (uso em produção) na documentação oficial
+// em ai.google.dev. O Gemini 2.5 Flash está sendo descontinuado (desligamento
+// previsto p/ out/2026) e já não é disponibilizado para chaves de API novas.
+// Sobrescrevível via GEMINI_MODEL para quem quiser fixar outra versão.
+const MODEL_NAME = process.env.GEMINI_MODEL || "gemini-3.6-flash";
 const MAX_HISTORY_MESSAGES = 8;
 
 let client: GoogleGenAI | null = null;
@@ -73,12 +77,27 @@ interface GeminiResponseShape {
   relatedServiceSlug?: unknown;
 }
 
+// Alguns modelos, ocasionalmente, cercam a resposta em ```json ... ``` mesmo
+// com responseMimeType "application/json". Removemos isso antes de parsear
+// em vez de deixar o JSON.parse falhar por um detalhe cosmético.
+function extractJsonText(raw: string): string {
+  const trimmed = raw.trim();
+  const fenced = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  return (fenced?.[1] ?? trimmed).trim();
+}
+
 function parseAnswer(rawText: string): AssistantAnswer {
+  const cleaned = extractJsonText(rawText);
+
   let parsed: GeminiResponseShape;
   try {
-    parsed = JSON.parse(rawText);
+    parsed = JSON.parse(cleaned);
   } catch {
-    throw new Error("Resposta do Gemini não é um JSON válido.");
+    // Loga o texto bruto completo no servidor (não masked) para investigação,
+    // e inclui um trecho no erro que sobe até a UI em desenvolvimento.
+    console.error("[gemini] resposta bruta que falhou ao parsear como JSON:", rawText);
+    const snippet = rawText.slice(0, 300);
+    throw new Error(`Resposta do Gemini não é um JSON válido. Trecho recebido: ${snippet}`);
   }
 
   const urgency = parsed.urgency === "baixo" || parsed.urgency === "medio" || parsed.urgency === "alto" ? parsed.urgency : undefined;
@@ -112,14 +131,21 @@ async function getResponse(
       systemInstruction: buildSystemPrompt(),
       responseMimeType: "application/json",
       responseSchema: ASSISTANT_RESPONSE_SCHEMA,
-      temperature: 0.4,
-      maxOutputTokens: 800,
+      // temperature/top_p/top_k foram descontinuados na linha Gemini 3.x —
+      // não configuramos amostragem manualmente, usamos o padrão do modelo.
+      // thinkingLevel "minimal": esta é uma tarefa de classificação/formatação
+      // simples, não de raciocínio complexo — é o nível recomendado pela
+      // documentação para esse tipo de caso, e evita gastar parte do
+      // maxOutputTokens com "pensamento" antes da resposta final.
+      thinkingConfig: { thinkingLevel: ThinkingLevel.MINIMAL },
+      maxOutputTokens: 2048,
     },
   });
 
   const text = response.text;
   if (!text) {
-    throw new Error("Resposta vazia do Gemini.");
+    const finishReason = response.candidates?.[0]?.finishReason;
+    throw new Error(`Resposta vazia do Gemini${finishReason ? ` (finishReason: ${finishReason})` : ""}.`);
   }
 
   return parseAnswer(text);

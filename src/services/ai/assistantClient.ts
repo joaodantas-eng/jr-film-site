@@ -24,7 +24,12 @@ export async function requestAssistantAnswer(
 
   if (!response.ok) {
     const data = await response.json().catch(() => null);
-    throw new Error(typeof data?.error === "string" ? data.error : ASSISTANT_ERROR_MESSAGE);
+    const detail = typeof data?.detail === "string" && data.detail ? data.detail : null;
+    const genericError = typeof data?.error === "string" && data.error ? data.error : ASSISTANT_ERROR_MESSAGE;
+    // Em desenvolvimento a API devolve "detail" com o erro real do provider
+    // (ex: Gemini) — mostramos ele em vez da mensagem genérica para facilitar
+    // depurar. Em produção "detail" não vem preenchido, então cai no genérico.
+    throw new Error(detail ?? genericError);
   }
 
   const data = await response.json();

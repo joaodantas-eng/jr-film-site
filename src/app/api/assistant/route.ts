@@ -52,6 +52,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ answer });
   } catch (error) {
     console.error("[api/assistant] falha ao consultar o assistente:", error);
-    return NextResponse.json({ error: ASSISTANT_ERROR_MESSAGE }, { status: 502 });
+
+    const isProduction = process.env.NODE_ENV === "production";
+    const detail = error instanceof Error ? error.message : String(error);
+
+    // Em desenvolvimento, devolve o erro real do provider (ex: nome de modelo
+    // inválido, chave sem permissão) em vez de mascarar com a mensagem
+    // genérica — facilita depurar a integração. Em produção, só a mensagem
+    // amigável sai na resposta; o detalhe fica só no log do servidor.
+    return NextResponse.json(
+      isProduction ? { error: ASSISTANT_ERROR_MESSAGE } : { error: ASSISTANT_ERROR_MESSAGE, detail },
+      { status: 502 },
+    );
   }
 }
