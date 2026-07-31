@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { AssistantMessage } from "@/services/ai/types";
+import { AssistantMessage, VehicleInfo } from "@/services/ai/types";
 import { getAssistantAnswer } from "@/services/ai/assistant";
 import { ASSISTANT_WELCOME_MESSAGE } from "@/services/ai/prompt";
 
@@ -14,9 +14,9 @@ function createWelcomeMessage(): AssistantMessage {
 }
 
 // Guarda o histórico da conversa durante a sessão (em memória — reinicia ao
-// recarregar a página, como pedido na V3). Preparado para futuramente persistir
-// esse histórico (ex: por usuário logado) sem mudar a interface do hook.
-export function useAssistantChat() {
+// recarregar a página). Aceita opcionalmente os dados do veículo (coletados
+// na Central de Diagnóstico) para enriquecer a resposta do provider.
+export function useAssistantChat(vehicleInfo?: VehicleInfo | null) {
   const [messages, setMessages] = useState<AssistantMessage[]>(() => [createWelcomeMessage()]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -36,7 +36,9 @@ export function useAssistantChat() {
       setIsLoading(true);
 
       try {
-        const answer = await getAssistantAnswer(trimmed, messages);
+        const answer = await getAssistantAnswer(trimmed, messages, {
+          vehicleInfo: vehicleInfo ?? undefined,
+        });
         const assistantMessage: AssistantMessage = {
           id: createId(),
           role: "assistant",
@@ -49,8 +51,12 @@ export function useAssistantChat() {
         setIsLoading(false);
       }
     },
-    [isLoading, messages],
+    [isLoading, messages, vehicleInfo],
   );
 
-  return { messages, isLoading, sendMessage };
+  const addSystemNote = useCallback((content: string) => {
+    setMessages((prev) => [...prev, { id: createId(), role: "assistant", content, createdAt: Date.now() }]);
+  }, []);
+
+  return { messages, isLoading, sendMessage, addSystemNote };
 }

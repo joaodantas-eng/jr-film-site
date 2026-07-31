@@ -1,8 +1,13 @@
 import { motion } from "framer-motion";
 
+interface LoadingIndicatorProps {
+  label?: string;
+}
+
 // Indicador de "digitando" com um texto curto que reforça a sensação de análise —
-// sem soar artificial, e sem citar "IA" em nenhum momento.
-export function LoadingIndicator() {
+// sem soar artificial, e sem citar "IA" em nenhum momento. Label configurável
+// para ser reaproveitado tanto no chat de texto quanto na análise de foto.
+export function LoadingIndicator({ label = "Analisando o sintoma" }: LoadingIndicatorProps) {
   return (
     <div className="flex items-center gap-3 rounded-2xl rounded-bl-sm border border-border bg-surface px-4 py-3">
       <div className="flex items-center gap-1.5">
@@ -15,7 +20,7 @@ export function LoadingIndicator() {
           />
         ))}
       </div>
-      <span className="font-mono text-xs uppercase tracking-wider text-muted">Analisando o sintoma</span>
+      <span className="font-mono text-xs uppercase tracking-wider text-muted">{label}</span>
     </div>
   );
 }

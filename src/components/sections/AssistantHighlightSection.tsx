@@ -1,13 +1,19 @@
 "use client";
 
-import { ASSISTANT_NAME } from "@/services/ai/prompt";
+import { DIAGNOSTIC_CENTER_NAME } from "@/services/ai/prompt";
 import { SectionContainer } from "@/components/ui/SectionContainer";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/animations/Reveal";
-import { MessageCircle, Sparkles } from "lucide-react";
+import { MessageCircle, Sparkles, MessageSquareText, Camera, ClipboardList } from "lucide-react";
 import { motion } from "framer-motion";
 
-// Seção premium de destaque do Diagnóstico Inteligente — o principal diferencial
+const capabilities = [
+  { icon: MessageSquareText, label: "Texto" },
+  { icon: Camera, label: "Fotos" },
+  { icon: ClipboardList, label: "Dados do veículo" },
+];
+
+// Seção premium de destaque da Central de Diagnóstico — o principal diferencial
 // do site. Fica logo após o Hero, na posição de maior visibilidade da Home.
 export function AssistantHighlightSection() {
   return (
@@ -28,13 +34,25 @@ export function AssistantHighlightSection() {
                 <h2 className="mt-5 font-display text-4xl font-semibold leading-[1.05] tracking-tight text-foreground md:text-5xl">
                   Não sabe o que o seu carro tem?
                   <br />
-                  Pergunte ao {ASSISTANT_NAME}.
+                  Pergunte à {DIAGNOSTIC_CENTER_NAME}.
                 </h2>
 
                 <p className="mt-5 max-w-lg text-base leading-relaxed text-muted md:text-lg">
-                  Conte os sintomas que o seu veículo está apresentando e receba orientações iniciais sobre as
-                  possíveis causas — antes mesmo de trazer o carro para uma avaliação presencial.
+                  Conte o que aconteceu por texto, envie uma foto ou informe os dados do seu veículo — e receba
+                  orientações iniciais sobre as possíveis causas antes de trazer o carro para uma avaliação presencial.
                 </p>
+
+                <div className="mt-6 flex flex-wrap gap-3">
+                  {capabilities.map((capability) => (
+                    <span
+                      key={capability.label}
+                      className="flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-2 text-sm text-foreground/80"
+                    >
+                      <capability.icon className="h-4 w-4 text-accent" strokeWidth={1.75} />
+                      {capability.label}
+                    </span>
+                  ))}
+                </div>
 
                 <Button href="/diagnostico" size="lg" withArrow className="mt-8 px-8 py-4 text-base">
                   <MessageCircle className="h-5 w-5" />

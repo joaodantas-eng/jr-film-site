@@ -1,5 +1,5 @@
 import { siteConfig } from "@/data/site";
-import { ASSISTANT_NAME } from "@/services/ai/prompt";
+import { DIAGNOSTIC_CENTER_NAME } from "@/services/ai/prompt";
 import { buildMetadata } from "@/config/seo";
 import type { Metadata } from "next";
 
@@ -9,11 +9,11 @@ import { WhatsAppFloatingButton } from "@/components/buttons/WhatsAppFloatingBut
 import { SectionContainer } from "@/components/ui/SectionContainer";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { Breadcrumb } from "@/components/navigation/Breadcrumb";
-import { ChatWindow } from "@/components/assistant/ChatWindow";
+import { DiagnosticCenter } from "@/components/diagnostic/DiagnosticCenter";
 
 export const metadata: Metadata = buildMetadata({
-  title: ASSISTANT_NAME,
-  description: `Converse com o ${ASSISTANT_NAME} da ${siteConfig.name} e entenda as possíveis causas do problema do seu veículo antes de uma avaliação presencial em ${siteConfig.city}.`,
+  title: DIAGNOSTIC_CENTER_NAME,
+  description: `Descreva o problema por texto, envie uma foto ou informe os dados do seu veículo e receba orientações iniciais da ${siteConfig.name} antes de uma avaliação presencial em ${siteConfig.city}.`,
   path: "/diagnostico",
 });
 
@@ -22,19 +22,19 @@ export default function DiagnosticoPage() {
     <>
       <Navbar />
       <main className="pt-32 pb-20">
-        <SectionContainer className="mx-auto max-w-3xl">
-          <Breadcrumb items={[{ label: ASSISTANT_NAME }]} />
+        <SectionContainer className="mx-auto max-w-4xl">
+          <Breadcrumb items={[{ label: DIAGNOSTIC_CENTER_NAME }]} />
 
           <div className="mt-8">
             <SectionTitle
-              eyebrow="Diagnóstico Inteligente"
-              title={`Converse com o ${ASSISTANT_NAME}`}
-              description="Conte o que o seu veículo está apresentando e entenda as possíveis causas antes de trazer para uma avaliação presencial na JR Film. Isso não substitui o diagnóstico feito por um técnico — é um ponto de partida."
+              eyebrow={DIAGNOSTIC_CENTER_NAME}
+              title="Como você deseja explicar o problema do seu veículo?"
+              description="Escolha a forma mais fácil para você. Isso não substitui o diagnóstico feito por um técnico — é um ponto de partida antes de trazer o veículo para uma avaliação presencial."
             />
           </div>
 
           <div className="mt-10">
-            <ChatWindow />
+            <DiagnosticCenter />
           </div>
         </SectionContainer>
       </main>

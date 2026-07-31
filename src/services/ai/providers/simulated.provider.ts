@@ -1,4 +1,4 @@
-import { AIProvider, AssistantAnswer } from "../types";
+import { AIProvider, AssistantAnswer, AssistantContext, AssistantMessage } from "../types";
 import { findMatchingSymptom, isAutomotiveTopic } from "../knowledge/symptoms";
 import { ASSISTANT_WARNING, ASSISTANT_OFF_TOPIC_MESSAGE, ASSISTANT_FALLBACK_RECOMMENDATION } from "../prompt";
 
@@ -10,7 +10,18 @@ function simulateLatency() {
   return new Promise((resolve) => setTimeout(resolve, 700 + Math.random() * 500));
 }
 
-async function getResponse(userMessage: string): Promise<AssistantAnswer> {
+function vehicleMention(context?: AssistantContext): string {
+  const vehicle = context?.vehicleInfo;
+  if (!vehicle?.brand) return "";
+  const parts = [vehicle.brand, vehicle.model, vehicle.year].filter(Boolean).join(" ");
+  return parts ? ` Considerando que o veículo é um ${parts}, isso ajuda a direcionar melhor a avaliação presencial.` : "";
+}
+
+async function getResponse(
+  userMessage: string,
+  _history: AssistantMessage[],
+  context?: AssistantContext,
+): Promise<AssistantAnswer> {
   await simulateLatency();
 
   const symptom = findMatchingSymptom(userMessage);
@@ -18,8 +29,9 @@ async function getResponse(userMessage: string): Promise<AssistantAnswer> {
   if (symptom) {
     return {
       possibleCauses: symptom.possibleCauses,
-      recommendation: `${symptom.description} ${symptom.recommendation}`,
+      recommendation: `${symptom.description} ${symptom.recommendation}${vehicleMention(context)}`,
       warning: ASSISTANT_WARNING,
+      urgency: symptom.urgency,
       relatedServiceSlug: symptom.relatedServiceSlug,
     };
   }
@@ -35,7 +47,7 @@ async function getResponse(userMessage: string): Promise<AssistantAnswer> {
 
   return {
     possibleCauses: [],
-    recommendation: ASSISTANT_FALLBACK_RECOMMENDATION,
+    recommendation: `${ASSISTANT_FALLBACK_RECOMMENDATION}${vehicleMention(context)}`,
     warning: ASSISTANT_WARNING,
   };
 }
