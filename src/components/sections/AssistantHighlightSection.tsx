@@ -4,13 +4,12 @@ import { DIAGNOSTIC_CENTER_NAME } from "@/services/ai/prompts";
 import { SectionContainer } from "@/components/ui/SectionContainer";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/animations/Reveal";
-import { MessageCircle, Sparkles, MessageSquareText, Camera, ClipboardList } from "lucide-react";
+import { MessageCircle, Sparkles, MessageSquareText, Camera } from "lucide-react";
 import { motion } from "framer-motion";
 
 const capabilities = [
   { icon: MessageSquareText, label: "Texto" },
   { icon: Camera, label: "Fotos" },
-  { icon: ClipboardList, label: "Dados do veículo" },
 ];
 
 // Seção premium de destaque da Central de Diagnóstico — o principal diferencial

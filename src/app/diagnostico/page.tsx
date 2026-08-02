@@ -13,7 +13,7 @@ import { DiagnosticCenter } from "@/components/diagnostic/DiagnosticCenter";
 
 export const metadata: Metadata = buildMetadata({
   title: DIAGNOSTIC_CENTER_NAME,
-  description: `Descreva o problema por texto, envie uma foto ou informe os dados do seu veículo e receba orientações iniciais da ${siteConfig.name} antes de uma avaliação presencial em ${siteConfig.city}.`,
+  description: `Converse com o assistente automotivo da ${siteConfig.name}: descreva o problema, anexe uma foto, e receba orientações iniciais antes de uma avaliação presencial em ${siteConfig.city}.`,
   path: "/diagnostico",
 });
 
@@ -28,8 +28,8 @@ export default function DiagnosticoPage() {
           <div className="mt-8">
             <SectionTitle
               eyebrow={DIAGNOSTIC_CENTER_NAME}
-              title="Como você deseja explicar o problema do seu veículo?"
-              description="Escolha a forma mais fácil para você. Isso não substitui o diagnóstico feito por um técnico — é um ponto de partida antes de trazer o veículo para uma avaliação presencial."
+              title="Converse com o Assistente Automotivo da JR Film"
+              description="Conte o que o seu carro está apresentando e, se quiser, anexe uma foto — do painel, de um pneu, de um vazamento ou de qualquer outra parte. Isso não substitui o diagnóstico feito por um técnico — é um ponto de partida antes de trazer o veículo para uma avaliação presencial."
             />
           </div>
 

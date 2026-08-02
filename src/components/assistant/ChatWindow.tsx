@@ -2,21 +2,18 @@
 
 import { useEffect, useRef } from "react";
 import { useAssistantChat } from "@/hooks/useAssistantChat";
-import { VehicleInfo } from "@/services/ai/types";
 import { MessageBubble } from "./MessageBubble";
 import { QuickSuggestions } from "./QuickSuggestions";
 import { ChatInput } from "./ChatInput";
 import { LoadingIndicator } from "./LoadingIndicator";
 import { AnimatePresence, motion } from "framer-motion";
-import { CheckCircle2, RotateCcw, Trash2, AlertTriangle } from "lucide-react";
+import { RotateCcw, Trash2, AlertTriangle } from "lucide-react";
 
-interface ChatWindowProps {
-  vehicleInfo?: VehicleInfo | null;
-}
-
-export function ChatWindow({ vehicleInfo }: ChatWindowProps) {
-  const { messages, isLoading, error, sendMessage, startNewConversation, clearConversation } =
-    useAssistantChat(vehicleInfo);
+// Interface única de conversa — texto e foto no mesmo lugar, ao estilo de um
+// app de mensagens. Sem telas separadas, sem formulários.
+export function ChatWindow() {
+  const { messages, isLoading, isAnalyzingImage, error, sendMessage, startNewConversation, clearConversation } =
+    useAssistantChat();
   const scrollRef = useRef<HTMLDivElement>(null);
   const showSuggestions = messages.length <= 1;
 
@@ -31,32 +28,21 @@ export function ChatWindow({ vehicleInfo }: ChatWindowProps) {
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       className="flex h-[70vh] min-h-[520px] flex-col overflow-hidden rounded-3xl border border-border bg-surface/60"
     >
-      <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-3">
-        {vehicleInfo?.brand ? (
-          <span className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-muted">
-            <CheckCircle2 className="h-3.5 w-3.5 text-accent" />
-            Usando dados de: {[vehicleInfo.brand, vehicleInfo.model, vehicleInfo.year].filter(Boolean).join(" ")}
-          </span>
-        ) : (
-          <span />
-        )}
-
-        <div className="flex items-center gap-1">
-          <button
-            onClick={startNewConversation}
-            className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs text-muted transition-colors hover:bg-surface-elevated hover:text-foreground"
-          >
-            <RotateCcw className="h-3.5 w-3.5" />
-            Nova conversa
-          </button>
-          <button
-            onClick={clearConversation}
-            className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs text-muted transition-colors hover:bg-surface-elevated hover:text-foreground"
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-            Limpar
-          </button>
-        </div>
+      <div className="flex items-center justify-end gap-1 border-b border-border px-5 py-3">
+        <button
+          onClick={startNewConversation}
+          className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs text-muted transition-colors hover:bg-surface-elevated hover:text-foreground"
+        >
+          <RotateCcw className="h-3.5 w-3.5" />
+          Nova conversa
+        </button>
+        <button
+          onClick={clearConversation}
+          className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs text-muted transition-colors hover:bg-surface-elevated hover:text-foreground"
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+          Limpar
+        </button>
       </div>
 
       <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto p-5 md:p-6">
@@ -75,7 +61,7 @@ export function ChatWindow({ vehicleInfo }: ChatWindowProps) {
 
         {isLoading && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <LoadingIndicator />
+            <LoadingIndicator label={isAnalyzingImage ? "Assistente analisando..." : "Assistente digitando..."} />
           </motion.div>
         )}
 
@@ -86,7 +72,7 @@ export function ChatWindow({ vehicleInfo }: ChatWindowProps) {
             className="flex items-center gap-2 rounded-xl border border-accent/30 bg-accent/5 px-4 py-2.5 text-xs text-accent"
           >
             <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-            Tivemos um problema para responder. Pode tentar de novo, ou falar direto no WhatsApp.
+            {error}
           </motion.div>
         )}
 
