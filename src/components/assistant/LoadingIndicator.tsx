@@ -1,26 +1,36 @@
-import { motion } from "framer-motion";
+import TextRevealBlur from "@/components/animations/TextRevealBlur";
 
 interface LoadingIndicatorProps {
   label?: string;
 }
 
-// Indicador de "digitando" com um texto curto que reforça a sensação de análise —
-// sem soar artificial, e sem citar "IA" em nenhum momento. Label configurável
-// para ser reaproveitado tanto no chat de texto quanto na análise de foto.
+// Indicador de "digitando" — o texto é revelado por um blob que "escreve" a
+// frase, no lugar dos três pontinhos genéricos. Label configurável para ser
+// reaproveitado tanto no chat de texto quanto na análise de foto.
 export function LoadingIndicator({ label = "Assistente digitando..." }: LoadingIndicatorProps) {
   return (
-    <div className="flex items-center gap-3 rounded-2xl rounded-bl-sm border border-border bg-surface px-4 py-3">
-      <div className="flex items-center gap-1.5">
-        {[0, 1, 2].map((i) => (
-          <motion.span
-            key={i}
-            className="h-1.5 w-1.5 rounded-full bg-accent"
-            animate={{ opacity: [0.3, 1, 0.3], y: [0, -2, 0] }}
-            transition={{ duration: 1.1, repeat: Infinity, delay: i * 0.15, ease: "easeInOut" }}
-          />
-        ))}
+    <div className="flex items-center rounded-2xl rounded-bl-sm border border-border bg-surface px-4 py-3">
+      <div className="h-6 w-56">
+        <TextRevealBlur
+          prefix=""
+          texts={[label]}
+          font={{
+            fontFamily: "var(--font-mono, monospace)",
+            fontSize: "12px",
+            fontWeight: 500,
+            letterSpacing: "0.05em",
+            lineHeight: "1.2em",
+            textAlign: "left",
+            textTransform: "uppercase",
+          }}
+          color="#8A8A8A"
+          wipeColor="#EF4444"
+          revealColor="#DC2626"
+          blobSize={7}
+          blur={6}
+          transition={{ delay: 1.2 }}
+        />
       </div>
-      <span className="font-mono text-xs uppercase tracking-wider text-muted">{label}</span>
     </div>
   );
 }

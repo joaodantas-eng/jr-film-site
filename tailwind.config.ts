@@ -4,6 +4,15 @@ const config: Config = {
   content: ["./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
+      keyframes: {
+        shine: {
+          "0%": { transform: "translateX(-150%) skewX(-20deg)" },
+          "100%": { transform: "translateX(150%) skewX(-20deg)" },
+        },
+      },
+      animation: {
+        shine: "shine 1.1s ease-in-out",
+      },
       colors: {
         background: "#0A0A0A",
         surface: "#141414",
