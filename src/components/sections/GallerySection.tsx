@@ -15,13 +15,13 @@ export function GallerySection() {
           align="center"
           className="mx-auto"
         />
-        <div className="mt-14 h-[70vh] min-h-[420px] overflow-hidden rounded-3xl border border-border">
+        <div className="mt-14 h-[85vh] min-h-[540px] w-full overflow-hidden rounded-3xl border border-border">
           <DriftWall
             items={items}
-            columns={4}
-            tileWidth={220}
-            tileHeight={160}
-            gap={16}
+            columns={6}
+            tileWidth={190}
+            tileHeight={150}
+            gap={14}
             radius={16}
             speed={30}
             overlayColor="#0A0A0A"
