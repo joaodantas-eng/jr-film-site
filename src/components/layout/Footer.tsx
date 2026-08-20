@@ -60,6 +60,8 @@ export function Footer() {
         <SectionContainer className="flex flex-col items-center justify-between gap-2 text-xs text-muted md:flex-row">
           <span>
             © {new Date().getFullYear()} {siteConfig.legalName}. Todos os direitos reservados.
+            {" · "}
+            <a href="/privacidade" className="hover:text-foreground">Privacidade</a>
           </span>
           <span className="font-mono">{siteConfig.city} / {siteConfig.state}</span>
         </SectionContainer>

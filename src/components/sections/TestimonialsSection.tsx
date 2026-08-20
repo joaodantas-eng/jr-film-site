@@ -1,4 +1,4 @@
-import { testimonials } from "@/data/testimonials";
+import { getGoogleTestimonials } from "@/services/googlePlaces";
 import { contactInfo } from "@/data/contact";
 import { SectionContainer } from "@/components/ui/SectionContainer";
 import { SectionTitle } from "@/components/ui/SectionTitle";
@@ -7,7 +7,8 @@ import { ReviewCard } from "@/components/cards/ReviewCard";
 import { StaggerGroup, StaggerItem } from "@/components/animations/StaggerGroup";
 import { Star } from "lucide-react";
 
-export function TestimonialsSection() {
+export async function TestimonialsSection() {
+  const testimonials = await getGoogleTestimonials();
   return (
     <section id="depoimentos" className="border-y border-border bg-surface/40 py-24 md:py-32">
       <SectionContainer>

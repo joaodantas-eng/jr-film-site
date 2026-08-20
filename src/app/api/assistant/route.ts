@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAssistantAnswer } from "@/services/ai/assistant";
 import { sanitizeUserMessage } from "@/services/ai/utils/sanitize";
+import { isRateLimited } from "@/services/ai/utils/rateLimit";
 import { ASSISTANT_ERROR_MESSAGE } from "@/services/ai/prompts/constants";
 import { AssistantMessage, ImageAttachment } from "@/services/ai/types";
 
@@ -27,6 +28,11 @@ async function fileToImageAttachment(file: File): Promise<ImageAttachment> {
 // do cliente. Recebe multipart/form-data (mensagem + histórico em JSON +
 // imagem opcional) — mesma requisição carrega texto e foto, como pedido.
 export async function POST(request: NextRequest) {
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  if (isRateLimited(ip)) {
+    return NextResponse.json({ error: "Muitas mensagens em pouco tempo. Aguarde um instante e tente de novo." }, { status: 429 });
+  }
+
   let formData: FormData;
   try {
     formData = await request.formData();

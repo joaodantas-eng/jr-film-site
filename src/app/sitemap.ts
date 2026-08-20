@@ -9,6 +9,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: siteConfig.url, lastModified: new Date(), changeFrequency: "monthly", priority: 1 },
     { url: `${siteConfig.url}/diagnostico`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.9 },
     { url: `${siteConfig.url}/promocoes`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 },
+    { url: `${siteConfig.url}/privacidade`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.3 },
   ];
 
   const serviceRoutes: MetadataRoute.Sitemap = services.map((service) => ({

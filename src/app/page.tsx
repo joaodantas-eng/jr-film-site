@@ -14,6 +14,7 @@ import { TestimonialsSection } from "@/components/sections/TestimonialsSection";
 import { FAQSection } from "@/components/sections/FAQSection";
 import { CTASection } from "@/components/sections/CTASection";
 import { ContactSection } from "@/components/sections/ContactSection";
+import { SeoKeywordsSection } from "@/components/sections/SeoKeywordsSection";
 
 // A Home apenas orquestra as sections — nenhuma lógica de UI ou dado vive aqui.
 // O Diagnóstico Inteligente vem logo após o Hero: é o principal diferencial do site.
@@ -36,6 +37,7 @@ export default function Home() {
         <FAQSection />
         <CTASection />
         <ContactSection />
+        <SeoKeywordsSection />
       </main>
       <Footer />
       <WhatsAppFloatingButton />

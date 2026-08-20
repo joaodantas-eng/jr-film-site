@@ -5,6 +5,7 @@ import { siteConfig } from "@/data/site";
 import { seoDefaults } from "@/config/seo";
 import { contactInfo } from "@/data/contact";
 import { socialLinks } from "@/data/social";
+import { Analytics } from "@vercel/analytics/react";
 
 const archivo = Archivo({
   subsets: ["latin"],
@@ -91,6 +92,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         {children}
+        <Analytics />
       </body>
     </html>
   );
