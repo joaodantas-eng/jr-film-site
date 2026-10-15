@@ -39,6 +39,13 @@ function sign(payload: string, secret: string): string {
 }
 
 // Cookie = "<expira em ms>.<assinatura>", ligado ao visitante (hash do IP).
+export const SESSION_COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "strict" as const,
+  path: "/api/assistant",
+};
+
 export function createSessionCookieValue(visitorKey: string): { value: string; maxAge: number } {
   const secret = secretKey();
   if (!secret) throw new Error("CAPTCHA não configurado.");

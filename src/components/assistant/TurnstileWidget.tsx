@@ -28,10 +28,13 @@ export interface TurnstileHandle {
 interface TurnstileWidgetProps {
   onToken: (token: string | null) => void;
   onError: (failed: boolean) => void;
+  // "always" mostra a caixa de verificação sempre; "interaction-only" só
+  // quando a Cloudflare precisa de uma confirmação manual.
+  appearance?: "always" | "interaction-only";
 }
 
 export const TurnstileWidget = forwardRef<TurnstileHandle, TurnstileWidgetProps>(function TurnstileWidget(
-  { onToken, onError },
+  { onToken, onError, appearance = "interaction-only" },
   ref,
 ) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -45,7 +48,7 @@ export const TurnstileWidget = forwardRef<TurnstileHandle, TurnstileWidgetProps>
     widgetIdRef.current = window.turnstile.render(containerRef.current, {
       sitekey: TURNSTILE_SITE_KEY,
       action: "assistant",
-      appearance: "interaction-only",
+      appearance,
       theme: "dark",
       language: "pt-br",
       callback: (token: string) => {
@@ -60,7 +63,7 @@ export const TurnstileWidget = forwardRef<TurnstileHandle, TurnstileWidgetProps>
         return true;
       },
     });
-  }, []);
+  }, [appearance]);
 
   useEffect(() => {
     if (window.turnstile) setScriptReady(true);

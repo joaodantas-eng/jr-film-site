@@ -1,6 +1,7 @@
 import { WhatsAppButton } from "@/components/buttons/WhatsAppButton";
 import { Promotion } from "@/types";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 // Card de oferta: foto ilustrativa, nome, condição e preço em destaque.
 // Mostra só o que está cadastrado em data/promotions.ts (sem inventar
@@ -8,20 +9,34 @@ import Image from "next/image";
 export function PromotionCard({
   promotion,
   headingLevel = "h2",
+  layout = "horizontal",
 }: {
   promotion: Promotion;
   headingLevel?: "h2" | "h3";
+  // "vertical" (foto em cima) para grades de 3 colunas; "horizontal" para 2.
+  layout?: "horizontal" | "vertical";
 }) {
   const Heading = headingLevel;
+  const isHorizontal = layout === "horizontal";
   return (
-    <article className="group grid h-full overflow-hidden rounded-3xl border border-border bg-surface sm:grid-cols-[0.9fr_1.1fr]">
-      <div className="relative aspect-[16/10] bg-surface-elevated sm:aspect-auto sm:min-h-full">
+    <article
+      className={cn(
+        "group grid h-full overflow-hidden rounded-3xl border border-border bg-surface",
+        isHorizontal ? "sm:grid-cols-[0.9fr_1.1fr]" : "grid-rows-[auto_1fr]",
+      )}
+    >
+      <div
+        className={cn(
+          "relative bg-surface-elevated",
+          isHorizontal ? "aspect-[16/10] sm:aspect-auto sm:min-h-full" : "aspect-[4/3]",
+        )}
+      >
         {/* Foto ilustrativa: o texto já descreve a oferta, então a imagem é decorativa. */}
         <Image
           src={promotion.image}
           alt=""
           fill
-          sizes="(max-width: 640px) 100vw, 25vw"
+          sizes={isHorizontal ? "(max-width: 640px) 100vw, 25vw" : "(max-width: 768px) 100vw, 33vw"}
           className="object-cover transition-transform duration-500 ease-premium group-hover:scale-[1.03] motion-reduce:group-hover:scale-100"
         />
         <span className="absolute left-3 top-3 rounded-md bg-accent px-2.5 py-1 text-xs font-bold text-white">

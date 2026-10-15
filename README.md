@@ -51,8 +51,11 @@ A rota `POST /api/assistant` aplica, nesta ordem:
    contados no Upstash Redis. Em produção, sem Upstash, o assistente fica
    indisponível (não há contagem só em memória).
 5. Uma requisição por vez por visitante e teto de chamadas simultâneas.
-6. CAPTCHA (Cloudflare Turnstile): a primeira mensagem exige um token válido;
-   depois, um cookie assinado de 30 minutos dispensa nova verificação.
+6. CAPTCHA (Cloudflare Turnstile): ao abrir o assistente, o visitante passa
+   por uma tela de verificação (`POST /api/assistant/verify`); o servidor
+   devolve um cookie assinado de 30 minutos que libera o chat. Sem esse cookie,
+   a API recusa mensagens. Localmente, use as chaves de teste da Cloudflare
+   no `.env.local` (`1x00000000000000000000AA` / `1x0000000000000000000000000000000AA`).
 7. Validação de mensagem (500 caracteres), histórico (10 mensagens, 1 foto) e
    imagem (assinatura real do arquivo, até 3 MB; o navegador reduz a foto antes).
 8. Chamada ao Gemini sem novas tentativas automáticas, com tempo limite e teto de tokens.

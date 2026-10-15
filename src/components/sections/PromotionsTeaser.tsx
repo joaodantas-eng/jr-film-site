@@ -26,10 +26,10 @@ export function PromotionsTeaser() {
             Ver todas as promoções
           </Button>
         </div>
-        <ul className="mt-12 grid gap-6 lg:grid-cols-2">
-          {active.slice(0, 2).map((promotion) => (
+        <ul className="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+          {active.slice(0, 3).map((promotion) => (
             <li key={promotion.id}>
-              <PromotionCard promotion={promotion} headingLevel="h3" />
+              <PromotionCard promotion={promotion} headingLevel="h3" layout="vertical" />
             </li>
           ))}
         </ul>

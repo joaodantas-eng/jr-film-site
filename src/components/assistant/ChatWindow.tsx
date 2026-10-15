@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CaptchaBridge, useAssistantChat } from "@/hooks/useAssistantChat";
-import { TURNSTILE_SITE_KEY, TurnstileHandle, TurnstileWidget } from "./TurnstileWidget";
+import { TURNSTILE_SITE_KEY } from "./TurnstileWidget";
+import { CaptchaGate } from "./CaptchaGate";
 import { MessageBubble } from "./MessageBubble";
 import { QuickSuggestions } from "./QuickSuggestions";
 import { ChatInput } from "./ChatInput";
@@ -11,26 +12,53 @@ import { buildWhatsAppLink } from "@/services/whatsapp";
 import { AssistantAvatar } from "./AssistantAvatar";
 import { RotateCcw, AlertTriangle, MessageCircle } from "lucide-react";
 
+const VERIFIED_KEY = "jrfilm-assistant-verified-until";
+
 // Interface única de conversa — texto e foto no mesmo lugar, ao estilo de um
 // app de mensagens. Sem telas separadas, sem formulários.
 export function ChatWindow({ imagesEnabled = true }: { imagesEnabled?: boolean }) {
-  // CAPTCHA: enquanto não houver token nem sessão já verificada, o envio fica
-  // bloqueado. Sem NEXT_PUBLIC_TURNSTILE_SITE_KEY, o CAPTCHA fica desligado.
+  // CAPTCHA (Turnstile): o chat fica atrás de uma tela de verificação até o
+  // servidor liberar a sessão (cookie de 30 min). Se a sessão expirar, a API
+  // responde "captcha_required" e a tela volta, sem perder a conversa.
+  // Sem NEXT_PUBLIC_TURNSTILE_SITE_KEY, o CAPTCHA fica desligado.
   const captchaEnabled = Boolean(TURNSTILE_SITE_KEY);
-  const turnstileRef = useRef<TurnstileHandle>(null);
-  const tokenRef = useRef<string | null>(null);
-  const [hasToken, setHasToken] = useState(false);
-  const [sessionVerified, setSessionVerified] = useState(false);
-  const [captchaFailed, setCaptchaFailed] = useState(false);
+  const [verified, setVerified] = useState(false);
+
+  useEffect(() => {
+    if (!captchaEnabled) return;
+    try {
+      const until = Number(window.sessionStorage.getItem(VERIFIED_KEY));
+      if (until > Date.now()) setVerified(true);
+    } catch {
+      // sem armazenamento: o visitante verifica de novo
+    }
+  }, [captchaEnabled]);
+
+  function markVerified(expiresInSeconds: number) {
+    try {
+      // Margem de 1 minuto antes de o cookie do servidor expirar.
+      window.sessionStorage.setItem(VERIFIED_KEY, String(Date.now() + (expiresInSeconds - 60) * 1000));
+    } catch {
+      // ignora: a verificação continua valendo pelo cookie
+    }
+    setVerified(true);
+  }
 
   const captcha = useMemo<CaptchaBridge | undefined>(
     () =>
       captchaEnabled
         ? {
-            getToken: () => tokenRef.current,
-            onTokenUsed: () => turnstileRef.current?.reset(),
-            onVerified: () => setSessionVerified(true),
-            onRejected: () => setSessionVerified(false),
+            getToken: () => null,
+            onTokenUsed: () => undefined,
+            onVerified: () => undefined,
+            onRejected: () => {
+              try {
+                window.sessionStorage.removeItem(VERIFIED_KEY);
+              } catch {
+                // ignora
+              }
+              setVerified(false);
+            },
           }
         : undefined,
     [captchaEnabled],
@@ -38,7 +66,7 @@ export function ChatWindow({ imagesEnabled = true }: { imagesEnabled?: boolean }
 
   const { messages, isLoading, isAnalyzingImage, error, sendMessage, retryLastMessage, startNewConversation } =
     useAssistantChat(captcha);
-  const waitingForCaptcha = captchaEnabled && !sessionVerified && !hasToken;
+  const locked = captchaEnabled && !verified;
 
   // Pergunta vinda de um link da Home (/diagnostico?pergunta=...): só preenche o campo.
   const [prefill, setPrefill] = useState<string>();
@@ -82,93 +110,81 @@ export function ChatWindow({ imagesEnabled = true }: { imagesEnabled?: boolean }
         )}
       </div>
 
-      <div
-        ref={scrollRef}
-        role="log"
-        aria-live="polite"
-        aria-label="Conversa com o assistente"
-        className="flex-1 space-y-5 overflow-y-auto overscroll-contain px-4 py-5 md:px-6"
-      >
-        {messages.map((message) => (
-          <div key={message.id} className="animate-message-in">
-            <MessageBubble message={message} />
-          </div>
-        ))}
-
-        {isLoading && (
-          <LoadingIndicator
-            label={isAnalyzingImage ? "Analisando a foto e escrevendo a resposta…" : "Escrevendo a resposta…"}
-          />
-        )}
-
-        {error && !isLoading && (
-          <div role="alert" className="rounded-2xl border border-accent/50 bg-accent/[0.08] p-4">
-            <p className="flex items-start gap-2 text-sm leading-relaxed text-foreground">
-              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-accent-fg" aria-hidden="true" />
-              {error.message}
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {error.canRetry && (
-                <button
-                  type="button"
-                  onClick={retryLastMessage}
-                  disabled={waitingForCaptcha}
-                  className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-foreground/30 px-4 text-sm font-semibold text-foreground transition-colors hover:border-foreground hover:bg-foreground/5 disabled:opacity-50"
-                >
-                  <RotateCcw className="h-4 w-4" aria-hidden="true" />
-                  Tentar novamente
-                </button>
-              )}
-              <a
-                href={buildWhatsAppLink("Olá! Tentei usar o assistente do site e gostaria de falar com a equipe.")}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex min-h-11 items-center gap-1.5 rounded-lg px-4 text-sm font-semibold text-foreground/85 underline-offset-4 hover:underline"
-              >
-                <MessageCircle className="h-4 w-4" aria-hidden="true" />
-                Falar com a JR Film no WhatsApp
-              </a>
-            </div>
-          </div>
-        )}
-
-        {!hasUserMessages && (
-          <div className="pt-2">
-            <p className="mb-3 text-sm font-semibold text-foreground/80">
-              Comece por um exemplo ou escreva com suas palavras:
-            </p>
-            <QuickSuggestions onSelect={(text) => void sendMessage(text)} disabled={isLoading || waitingForCaptcha} />
-          </div>
-        )}
-      </div>
-
-      {captchaEnabled && (
-        <div className="px-4">
-          <TurnstileWidget
-            ref={turnstileRef}
-            onToken={(token) => {
-              tokenRef.current = token;
-              setHasToken(Boolean(token));
-            }}
-            onError={setCaptchaFailed}
-          />
-          {waitingForCaptcha && (
-            <p role="status" className="py-2 text-center text-xs text-muted">
-              {captchaFailed
-                ? "Não foi possível carregar a verificação de segurança. Recarregue a página ou fale com a JR Film pelo WhatsApp."
-                : "Fazendo uma verificação rápida de segurança…"}
-            </p>
-          )}
+      {locked ? (
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          <CaptchaGate onVerified={markVerified} />
         </div>
-      )}
+      ) : (
+        <>
+          <div
+            ref={scrollRef}
+            role="log"
+            aria-live="polite"
+            aria-label="Conversa com o assistente"
+            className="flex-1 space-y-5 overflow-y-auto overscroll-contain px-4 py-5 md:px-6"
+          >
+            {messages.map((message) => (
+              <div key={message.id} className="animate-message-in">
+                <MessageBubble message={message} />
+              </div>
+            ))}
 
-      <ChatInput
-        onSend={(text, image) => void sendMessage(text, image)}
-        disabled={isLoading}
-        submitBlocked={waitingForCaptcha}
-        imagesEnabled={imagesEnabled}
-        prefill={prefill}
-      />
+            {isLoading && (
+              <LoadingIndicator
+                label={isAnalyzingImage ? "Analisando a foto e escrevendo a resposta…" : "Escrevendo a resposta…"}
+              />
+            )}
+
+            {error && !isLoading && (
+              <div role="alert" className="rounded-2xl border border-accent/50 bg-accent/[0.08] p-4">
+                <p className="flex items-start gap-2 text-sm leading-relaxed text-foreground">
+                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-accent-fg" aria-hidden="true" />
+                  {error.message}
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {error.canRetry && (
+                    <button
+                      type="button"
+                      onClick={retryLastMessage}
+                      disabled={locked}
+                      className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-foreground/30 px-4 text-sm font-semibold text-foreground transition-colors hover:border-foreground hover:bg-foreground/5 disabled:opacity-50"
+                    >
+                      <RotateCcw className="h-4 w-4" aria-hidden="true" />
+                      Tentar novamente
+                    </button>
+                  )}
+                  <a
+                    href={buildWhatsAppLink("Olá! Tentei usar o assistente do site e gostaria de falar com a equipe.")}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-11 items-center gap-1.5 rounded-lg px-4 text-sm font-semibold text-foreground/85 underline-offset-4 hover:underline"
+                  >
+                    <MessageCircle className="h-4 w-4" aria-hidden="true" />
+                    Falar com a JR Film no WhatsApp
+                  </a>
+                </div>
+              </div>
+            )}
+
+            {!hasUserMessages && (
+              <div className="pt-2">
+                <p className="mb-3 text-sm font-semibold text-foreground/80">
+                  Comece por um exemplo ou escreva com suas palavras:
+                </p>
+                <QuickSuggestions onSelect={(text) => void sendMessage(text)} disabled={isLoading || locked} />
+              </div>
+            )}
+          </div>
+
+          <ChatInput
+            onSend={(text, image) => void sendMessage(text, image)}
+            disabled={isLoading}
+            submitBlocked={locked}
+            imagesEnabled={imagesEnabled}
+            prefill={prefill}
+          />
+        </>
+      )}
     </div>
   );
 }

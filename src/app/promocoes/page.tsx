@@ -12,8 +12,8 @@ import { PromotionCard } from "@/components/cards/PromotionCard";
 import { TrackOnMount } from "@/components/analytics/TrackOnMount";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Promoções em troca de óleo e pneus",
-  description: `Promoções ativas da ${siteConfig.name} em ${siteConfig.city}/${siteConfig.state}, como combo de troca de óleo e ofertas de pneus. Confirme a validade e peça pelo WhatsApp.`,
+  title: "Promoções em troca de óleo, pneus e palhetas",
+  description: `Promoções ativas da ${siteConfig.name} em ${siteConfig.city}/${siteConfig.state}, como combo de troca de óleo, pneus e palhetas. Confirme a validade e peça pelo WhatsApp.`,
   path: "/promocoes",
 });
 
@@ -36,10 +36,10 @@ export default function PromotionsPage() {
       </SectionContainer>
       <SectionContainer className="mt-12">
         {activePromotions.length > 0 ? (
-          <StaggerGroup as="ul" className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+          <StaggerGroup as="ul" className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
             {activePromotions.map((promotion) => (
               <StaggerItem as="li" key={promotion.id} className="h-full">
-                <PromotionCard promotion={promotion} />
+                <PromotionCard promotion={promotion} layout="vertical" />
               </StaggerItem>
             ))}
           </StaggerGroup>

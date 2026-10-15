@@ -13,6 +13,7 @@ import {
   createSessionCookieValue,
   hasValidSession,
   isCaptchaEnabled,
+  SESSION_COOKIE_OPTIONS,
   verifyTurnstileToken,
 } from "@/services/ai/utils/captcha";
 import { parseHistory, validateImageFile } from "@/services/ai/utils/validation";
@@ -87,13 +88,7 @@ export async function POST(request: NextRequest) {
   const withSession = (response: NextResponse) => {
     if (issueSessionCookie) {
       const session = createSessionCookieValue(visitorKey);
-      response.cookies.set(CAPTCHA_COOKIE, session.value, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        path: "/api/assistant",
-        maxAge: session.maxAge,
-      });
+      response.cookies.set(CAPTCHA_COOKIE, session.value, { ...SESSION_COOKIE_OPTIONS, maxAge: session.maxAge });
     }
     return response;
   };
