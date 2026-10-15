@@ -1,73 +1,109 @@
-"use client";
-
+import Image from "next/image";
 import { siteConfig } from "@/data/site";
+import { contactInfo } from "@/data/contact";
 import { Button } from "@/components/ui/Button";
 import { WhatsAppButton } from "@/components/buttons/WhatsAppButton";
-import { motion } from "framer-motion";
 import { SectionContainer } from "@/components/ui/SectionContainer";
 
+// Primeira dobra: texto à esquerda, foto real da oficina à direita (pinça de
+// freio vermelha no equipamento de alinhamento), emoldurada por réguas de
+// medição — referência à precisão do trabalho. Animação de entrada só aqui,
+// em CSS, uma única vez (respeita prefers-reduced-motion via globals.css).
 export function HeroSection() {
+  const weekday = contactInfo.hours[0];
+  const saturday = contactInfo.hours[1];
+
   return (
-    <section id="top" className="relative flex min-h-screen items-center overflow-hidden pt-20">
-      {/* Fundo com grid técnico sutil, referência a plantas de engenharia automotiva */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.06]"
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)",
-          backgroundSize: "64px 64px",
-        }}
-      />
-      <div className="pointer-events-none absolute -right-40 top-1/4 h-[500px] w-[500px] rounded-full bg-accent/10 blur-[140px]" />
+    <section
+      id="top"
+      aria-labelledby="hero-title"
+      data-track-location="hero"
+      className="relative overflow-hidden pb-14 pt-24 md:pb-20 lg:pt-32"
+    >
+      <SectionContainer className="grid items-center gap-12 lg:grid-cols-[1.08fr_0.92fr] lg:gap-16">
+        <div>
+          <h1 id="hero-title">
+            <span className="eyebrow animate-hero-text">
+              {siteConfig.name}, oficina mecânica e acessórios em {siteConfig.city}/{siteConfig.state}
+            </span>
+            <span className="type-display mt-6 block text-display-xl text-foreground animate-hero-text [animation-delay:80ms]">
+              {siteConfig.tagline}
+            </span>
+          </h1>
+          <p className="mt-7 max-w-[34rem] text-lg leading-relaxed text-foreground/75 animate-hero-text [animation-delay:160ms]">
+            Mecânica, alinhamento, pneus, insulfilm e acessórios no mesmo lugar — com o diagnóstico explicado e o
+            orçamento aprovado por você antes de qualquer serviço.
+          </p>
+          <div className="mt-9 flex flex-col gap-3 animate-hero-text [animation-delay:240ms] sm:flex-row">
+            <WhatsAppButton size="lg" label="Pedir orçamento no WhatsApp" />
+            <Button href="/servicos" variant="secondary" size="lg">
+              Ver serviços
+            </Button>
+          </div>
 
-      {/* Scan line — o "signature moment" do hero, referência a diagnóstico automotivo */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: [0, 1, 0] }}
-        transition={{ duration: 2.2, delay: 0.4, ease: "easeInOut" }}
-        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent to-transparent"
-        style={{ top: "45%" }}
-      />
+          <dl className="mt-12 grid gap-x-8 gap-y-5 border-t border-border pt-7 text-sm animate-hero-text [animation-delay:320ms] sm:grid-cols-3">
+            <div>
+              <dt className="text-muted">Atendimento</dt>
+              <dd className="tabular mt-1 font-medium text-foreground">
+                {weekday?.day}, {weekday?.time}
+                {saturday && (
+                  <>
+                    <br />
+                    {saturday.day}, {saturday.time}
+                  </>
+                )}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-muted">Endereço</dt>
+              <dd className="mt-1 font-medium text-foreground">
+                <a
+                  href={contactInfo.mapDirectionsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline decoration-foreground/25 underline-offset-4 transition-colors hover:decoration-accent"
+                >
+                  {contactInfo.address.street}, {contactInfo.address.neighborhood}
+                </a>
+              </dd>
+            </div>
+            <div>
+              <dt className="text-muted">Telefone</dt>
+              <dd className="tabular mt-1 font-medium text-foreground">
+                <a
+                  href={`tel:${contactInfo.phoneRaw}`}
+                  className="underline decoration-foreground/25 underline-offset-4 transition-colors hover:decoration-accent"
+                >
+                  {contactInfo.phoneDisplay}
+                </a>
+              </dd>
+            </div>
+          </dl>
+        </div>
 
-      <SectionContainer className="relative">
-        <motion.span
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-6 inline-block font-mono text-xs uppercase tracking-[0.25em] text-accent"
-        >
-          Oficina mecânica · {siteConfig.city}/{siteConfig.state}
-        </motion.span>
-
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="max-w-3xl font-display text-5xl font-semibold leading-[1.05] tracking-tight text-foreground md:text-7xl"
-        >
-          {siteConfig.tagline}
-        </motion.h1>
-
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-6 max-w-xl text-base leading-relaxed text-muted md:text-lg"
-        >
-          {siteConfig.description}
-        </motion.p>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-10 flex flex-wrap items-center gap-4"
-        >
-          <WhatsAppButton size="lg" label="Agendar avaliação" />
-          <Button href="#servicos" variant="secondary" size="lg">
-            Ver serviços
-          </Button>
-        </motion.div>
+        <figure className="relative pb-5 pl-5 lg:pb-6 lg:pl-6">
+          {/* Réguas de medição: borda esquerda e inferior da foto. */}
+          <span aria-hidden="true" className="ruler-y absolute bottom-5 left-0 top-0 w-4 lg:bottom-6" />
+          <span aria-hidden="true" className="ruler-x absolute bottom-0 left-5 right-0 h-4 lg:left-6" />
+          <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-surface animate-hero-photo sm:aspect-[16/11] lg:aspect-[4/5]">
+            <Image
+              src="/images/gallery/img_1310.jpg"
+              alt="Equipamento de alinhamento fixado na roda de um carro preto com pinça de freio vermelha, na oficina da JR Film"
+              fill
+              priority
+              sizes="(max-width: 1024px) 100vw, 45vw"
+              className="object-cover object-[50%_62%]"
+            />
+            <div
+              aria-hidden="true"
+              className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent"
+            />
+          </div>
+          <figcaption className="absolute bottom-10 left-10 rounded-lg bg-black/70 px-3 py-2 text-sm font-medium text-foreground backdrop-blur-sm lg:bottom-12 lg:left-12">
+            Alinhamento na oficina da JR Film
+          </figcaption>
+          <span aria-hidden="true" className="absolute -right-px top-8 h-16 w-1 bg-accent lg:top-12" />
+        </figure>
       </SectionContainer>
     </section>
   );

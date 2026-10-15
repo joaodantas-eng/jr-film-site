@@ -1,64 +1,58 @@
-import { siteConfig } from "@/data/site";
+import { siteConfig, isIndexable } from "@/data/site";
 import type { Metadata } from "next";
 
-// Defaults técnicos de SEO — separados de data/site.ts porque não são "conteúdo editorial",
-// e sim configuração de metadados reaproveitada por app/layout.tsx e futuras páginas.
+// Defaults técnicos de SEO — separados de data/site.ts porque não são
+// "conteúdo editorial", e sim configuração de metadados.
 export const seoDefaults = {
   titleTemplate: `%s | ${siteConfig.name}`,
-  defaultTitle: `${siteConfig.name} — Oficina Mecânica em ${siteConfig.city}/${siteConfig.state}`,
-  defaultDescription: siteConfig.description,
-  ogImage: "/images/og-cover.jpg",
-  keywords: [
-    "oficina mecânica",
-    "troca de óleo",
-    "suspensão",
-    "freios",
-    "alinhamento e balanceamento",
-    "insulfilm",
-    `oficina mecânica em ${siteConfig.city}`,
-    `centro automotivo em ${siteConfig.city}`,
-    `troca de óleo em ${siteConfig.city}`,
-    `insulfilm em ${siteConfig.city}`,
-    `suspensão em ${siteConfig.city}`,
-  ],
+  defaultTitle: `${siteConfig.name} — Oficina Mecânica e Acessórios em ${siteConfig.city}/${siteConfig.state}`,
+  defaultDescription: `Oficina mecânica em ${siteConfig.city}/${siteConfig.state}: troca de óleo, freios, suspensão, alinhamento, ar-condicionado, insulfilm e pneus. Fale com a JR Film pelo WhatsApp.`,
+  // Gerada em build por app/og-image.png/route.tsx (1200 × 630).
+  ogImage: "/og-image.png",
 };
 
-// Helper central para metadata individual por página (SEO da V2).
-// Toda rota nova chama esta função em vez de montar o objeto Metadata na mão,
-// garantindo Open Graph, Twitter Card e canonical consistentes em todo o site.
+export const robotsMetadata: Metadata["robots"] = isIndexable
+  ? { index: true, follow: true }
+  : { index: false, follow: false };
+
+// Helper central para metadata individual por página. Toda rota chama esta
+// função, garantindo título, descrição, canonical, Open Graph e Twitter Card
+// consistentes. O título recebe o sufixo do template definido no layout.
 export function buildMetadata({
   title,
   description,
   path,
   image,
-  keywords,
+  noIndex = false,
 }: {
   title: string;
   description: string;
   path: string;
   image?: string;
-  keywords?: string[];
+  noIndex?: boolean;
 }): Metadata {
-  const url = `${siteConfig.url}${path}`;
+  const url = `${siteConfig.url}${path === "/" ? "" : path}`;
   const ogImage = image ?? seoDefaults.ogImage;
-
+  const socialTitle = `${title} | ${siteConfig.name}`;
   return {
     title,
     description,
-    keywords: keywords ?? seoDefaults.keywords,
     alternates: { canonical: path },
+    robots: noIndex ? { index: false, follow: true } : robotsMetadata,
     openGraph: {
       type: "website",
       locale: siteConfig.locale,
       url,
       siteName: siteConfig.name,
-      title,
+      title: socialTitle,
       description,
-      images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
+      images: [
+        { url: ogImage, width: 1200, height: 630, alt: `${siteConfig.name} — oficina mecânica em ${siteConfig.city}` },
+      ],
     },
     twitter: {
       card: "summary_large_image",
-      title,
+      title: socialTitle,
       description,
       images: [ogImage],
     },

@@ -1,13 +1,24 @@
-import { Service } from "@/types";
+import { Service, ServiceGroup } from "@/types";
 
 // Fonte de dados dos serviços — hoje estática, futuramente substituível por
 // services/services.ts fazendo fetch em um banco, sem alterar nenhum componente.
 // Os campos estendidos (benefits, symptoms, process, faq...) alimentam a página
 // individual em app/servicos/[slug], gerada dinamicamente a partir deste array.
+export const serviceGroups: { id: ServiceGroup; title: string; description: string }[] = [
+  {
+    id: "mecanica",
+    title: "Mecânica e manutenção",
+    description: "Revisões e reparos com diagnóstico antes do orçamento.",
+  },
+  { id: "pneus", title: "Pneus", description: "Venda com orientação técnica e balanceamento incluso." },
+  { id: "estetica", title: "Insulfilm e acessórios", description: "Conforto, proteção e acabamento para o seu carro." },
+];
+
 export const services: Service[] = [
   {
     id: "svc-1",
     slug: "troca-de-oleo",
+    group: "mecanica",
     title: "Troca de Óleo",
     description:
       "Substituição de óleo e filtros com produtos homologados, respeitando as especificações do fabricante do seu veículo.",
@@ -46,14 +57,14 @@ export const services: Service[] = [
       {
         id: "faq-oleo-2",
         question: "Posso trocar só o óleo sem trocar o filtro?",
-        answer:
-          "Não recomendamos — o filtro sujo contamina o óleo novo rapidamente e reduz o benefício da troca.",
+        answer: "Não recomendamos — o filtro sujo contamina o óleo novo rapidamente e reduz o benefício da troca.",
       },
     ],
   },
   {
     id: "svc-2",
     slug: "suspensao",
+    group: "mecanica",
     title: "Suspensão",
     description:
       "Diagnóstico e reparo completo de amortecedores, molas e componentes, devolvendo estabilidade e conforto de condução.",
@@ -94,9 +105,9 @@ export const services: Service[] = [
   {
     id: "svc-3",
     slug: "freios",
+    group: "mecanica",
     title: "Freios",
-    description:
-      "Revisão de pastilhas, discos e fluido com testes de segurança antes da entrega do veículo.",
+    description: "Revisão de pastilhas, discos e fluido com testes de segurança antes da entrega do veículo.",
     metaDescription:
       "Revisão de freios em Nova Serrana: pastilhas, discos e fluido com teste de segurança. Agende na JR Film.",
     icon: "Disc3",
@@ -133,9 +144,9 @@ export const services: Service[] = [
   {
     id: "svc-4",
     slug: "alinhamento",
+    group: "mecanica",
     title: "Alinhamento",
-    description:
-      "Ajuste de geometria com equipamento a laser para rodagem correta e economia de pneus.",
+    description: "Ajuste de geometria com equipamento a laser para rodagem correta e economia de pneus.",
     metaDescription:
       "Alinhamento de direção em Nova Serrana com equipamento a laser. Economize pneus e dirija com mais estabilidade. JR Film.",
     icon: "GaugeCircle",
@@ -153,8 +164,7 @@ export const services: Service[] = [
       "Desgaste irregular na banda do pneu",
       "Vibração no volante em determinadas velocidades",
     ],
-    whenToDo:
-      "A cada 10.000 km, após trocar pneus, ou sempre que bater em um buraco ou meio-fio com mais força.",
+    whenToDo: "A cada 10.000 km, após trocar pneus, ou sempre que bater em um buraco ou meio-fio com mais força.",
     process: [
       { title: "Medição a laser", description: "Leitura dos ângulos atuais de convergência, câmber e cáster." },
       { title: "Comparação com a especificação", description: "Verificação contra os valores de fábrica do veículo." },
@@ -165,9 +175,9 @@ export const services: Service[] = [
   {
     id: "svc-5",
     slug: "balanceamento",
+    group: "mecanica",
     title: "Balanceamento",
-    description:
-      "Equilíbrio das rodas para eliminar vibração e prolongar a vida útil de pneus e suspensão.",
+    description: "Equilíbrio das rodas para eliminar vibração e prolongar a vida útil de pneus e suspensão.",
     metaDescription:
       "Balanceamento de rodas em Nova Serrana para eliminar vibração no volante e proteger a suspensão. Agende na JR Film.",
     icon: "Scale",
@@ -194,9 +204,9 @@ export const services: Service[] = [
   {
     id: "svc-6",
     slug: "ar-condicionado",
+    group: "mecanica",
     title: "Ar-Condicionado",
-    description:
-      "Higienização, recarga de gás e reparo do sistema de climatização com verificação de vazamentos.",
+    description: "Higienização, recarga de gás e reparo do sistema de climatização com verificação de vazamentos.",
     metaDescription:
       "Manutenção de ar-condicionado automotivo em Nova Serrana: higienização, recarga de gás e reparo. Agende na JR Film.",
     icon: "Wind",
@@ -216,7 +226,10 @@ export const services: Service[] = [
     ],
     whenToDo: "Higienização a cada 12 meses; recarga de gás quando o rendimento cair — geralmente a cada 1 a 2 anos.",
     process: [
-      { title: "Diagnóstico do sistema", description: "Verificação de pressão, vazamentos e funcionamento do compressor." },
+      {
+        title: "Diagnóstico do sistema",
+        description: "Verificação de pressão, vazamentos e funcionamento do compressor.",
+      },
       { title: "Higienização", description: "Limpeza do sistema para eliminar fungos e bactérias." },
       { title: "Recarga de gás", description: "Reposição do gás refrigerante na quantidade correta." },
       { title: "Teste de performance", description: "Conferência da temperatura de saída do ar." },
@@ -225,9 +238,9 @@ export const services: Service[] = [
   {
     id: "svc-7",
     slug: "insulfilm",
+    group: "estetica",
     title: "Insulfilm",
-    description:
-      "Aplicação de película automotiva com controle de temperatura interna e proteção contra radiação UV.",
+    description: "Aplicação de película automotiva com controle de temperatura interna e proteção contra radiação UV.",
     metaDescription:
       "Aplicação de insulfilm em Nova Serrana com controle de temperatura e proteção UV. Veja os graus disponíveis na JR Film.",
     icon: "SunDim",
@@ -251,6 +264,7 @@ export const services: Service[] = [
   {
     id: "svc-8",
     slug: "venda-de-pneus",
+    group: "pneus",
     title: "Venda de Pneus",
     description:
       "Pneus de marcas confiáveis para todos os perfis de veículo, com orientação técnica na hora da escolha.",
@@ -282,6 +296,7 @@ export const services: Service[] = [
   {
     id: "svc-9",
     slug: "acessorios",
+    group: "estetica",
     title: "Acessórios Automotivos",
     description:
       "Instalação de acessórios originais e homologados, com acabamento que preserva as características do veículo.",

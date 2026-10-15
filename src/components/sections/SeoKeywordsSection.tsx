@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { siteConfig } from "@/data/site";
 import { SectionContainer } from "@/components/ui/SectionContainer";
 
@@ -7,15 +8,34 @@ export function SeoKeywordsSection() {
   return (
     <section className="border-t border-border py-14">
       <SectionContainer>
-        <p className="mx-auto max-w-3xl text-center text-xs leading-relaxed text-muted">
+        <p className="mx-auto max-w-3xl text-center text-sm leading-relaxed text-muted">
           A JR Film é uma <strong className="text-foreground/70">oficina mecânica em {siteConfig.city}</strong>{" "}
-          especializada em <a href="/servicos/troca-de-oleo" className="underline underline-offset-2 hover:text-accent">troca de óleo</a>,{" "}
-          <a href="/servicos/freios" className="underline underline-offset-2 hover:text-accent">revisão de freios</a>,{" "}
-          <a href="/servicos/suspensao" className="underline underline-offset-2 hover:text-accent">suspensão</a>,{" "}
-          <a href="/servicos/alinhamento" className="underline underline-offset-2 hover:text-accent">alinhamento e balanceamento</a>,{" "}
-          <a href="/servicos/ar-condicionado" className="underline underline-offset-2 hover:text-accent">ar-condicionado automotivo</a>{" "}
-          e <a href="/servicos/insulfilm" className="underline underline-offset-2 hover:text-accent">insulfilm</a>. Atendemos
-          clientes de {siteConfig.city}/{siteConfig.state} e região com diagnóstico técnico e peças de procedência garantida.
+          especializada em{" "}
+          <Link href="/servicos/troca-de-oleo" className="underline underline-offset-2 hover:text-accent-fg">
+            troca de óleo
+          </Link>
+          ,{" "}
+          <Link href="/servicos/freios" className="underline underline-offset-2 hover:text-accent-fg">
+            revisão de freios
+          </Link>
+          ,{" "}
+          <Link href="/servicos/suspensao" className="underline underline-offset-2 hover:text-accent-fg">
+            suspensão
+          </Link>
+          ,{" "}
+          <Link href="/servicos/alinhamento" className="underline underline-offset-2 hover:text-accent-fg">
+            alinhamento e balanceamento
+          </Link>
+          ,{" "}
+          <Link href="/servicos/ar-condicionado" className="underline underline-offset-2 hover:text-accent-fg">
+            ar-condicionado automotivo
+          </Link>{" "}
+          e{" "}
+          <Link href="/servicos/insulfilm" className="underline underline-offset-2 hover:text-accent-fg">
+            insulfilm
+          </Link>
+          . Atendemos clientes de {siteConfig.city}/{siteConfig.state} e região com diagnóstico técnico e peças de
+          procedência garantida.
         </p>
       </SectionContainer>
     </section>

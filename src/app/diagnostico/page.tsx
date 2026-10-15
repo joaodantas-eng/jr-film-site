@@ -1,51 +1,50 @@
 import { siteConfig } from "@/data/site";
-import { DIAGNOSTIC_CENTER_NAME } from "@/services/ai/prompts";
+import { DIAGNOSTIC_CENTER_NAME } from "@/services/ai/prompts/constants";
+import { assistantConfig } from "@/services/ai/config";
 import { buildMetadata } from "@/config/seo";
 import type { Metadata } from "next";
-
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
-import { WhatsAppFloatingButton } from "@/components/buttons/WhatsAppFloatingButton";
+import { PageShell } from "@/components/layout/PageShell";
 import { SectionContainer } from "@/components/ui/SectionContainer";
 import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import { DiagnosticCenter } from "@/components/diagnostic/DiagnosticCenter";
-import { BlobTextReveal } from "@/components/animations/BlobTextReveal";
+import { TrackOnMount } from "@/components/analytics/TrackOnMount";
+import Link from "next/link";
 
 export const metadata: Metadata = buildMetadata({
-  title: DIAGNOSTIC_CENTER_NAME,
-  description: `Converse com o assistente automotivo da ${siteConfig.name}: descreva o problema, anexe uma foto, e receba orientações iniciais antes de uma avaliação presencial em ${siteConfig.city}.`,
+  title: `Diagnóstico automotivo online em ${siteConfig.city}`,
+  description: `Descreva o problema do seu carro (ou envie uma foto) e receba uma orientação inicial do assistente da ${siteConfig.name} antes da avaliação presencial em ${siteConfig.city}.`,
   path: "/diagnostico",
 });
 
 export default function DiagnosticoPage() {
   return (
-    <>
-      <Navbar />
-      <main className="pt-32 pb-20">
-        <SectionContainer className="mx-auto max-w-4xl">
-          <Breadcrumb items={[{ label: DIAGNOSTIC_CENTER_NAME }]} />
-
-          <div className="mt-8 max-w-2xl">
-            <span className="mb-3 block font-mono text-xs uppercase tracking-[0.2em] text-accent">
-              {DIAGNOSTIC_CENTER_NAME}
-            </span>
-            <h1 className="font-display text-3xl font-semibold leading-tight tracking-tight text-foreground md:text-4xl lg:text-5xl">
-              <BlobTextReveal text="Converse com o Assistente Automotivo da JR Film" />
-            </h1>
-            <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">
-              Conte o que o seu carro está apresentando e, se quiser, anexe uma foto — do painel, de um pneu, de um
-              vazamento ou de qualquer outra parte. Isso não substitui o diagnóstico feito por um técnico — é um
-              ponto de partida antes de trazer o veículo para uma avaliação presencial.
-            </p>
-          </div>
-
-          <div className="mt-10">
-            <DiagnosticCenter />
-          </div>
-        </SectionContainer>
-      </main>
-      <Footer />
-      <WhatsAppFloatingButton />
-    </>
+    <PageShell className="pb-16 pt-24 md:pt-32" showContactActions={false}>
+      <TrackOnMount event="assistant_open" />
+      <SectionContainer className="max-w-4xl">
+        <Breadcrumb items={[{ label: "Diagnóstico" }]} />
+        <div className="mt-6 max-w-2xl">
+          <p className="eyebrow mb-4">{DIAGNOSTIC_CENTER_NAME}</p>
+          <h1 className="type-display text-display-lg text-foreground">
+            Converse com o Assistente Automotivo da JR Film
+          </h1>
+          <p className="mt-4 text-base leading-relaxed text-foreground/75 md:text-lg">
+            Conte o que o seu carro está apresentando e, se quiser, anexe uma foto — do painel, de um pneu, de um
+            vazamento ou de qualquer outra parte. Isso não substitui o diagnóstico feito por um técnico — é um ponto de
+            partida antes de trazer o veículo para uma avaliação presencial.
+          </p>
+        </div>
+        <div className="mt-8 scroll-mt-20" id="chat">
+          <DiagnosticCenter enabled={assistantConfig.enabled} imagesEnabled={assistantConfig.imagesEnabled} />
+        </div>
+        <p className="mt-4 text-sm leading-relaxed text-muted">
+          As mensagens e fotos são processadas por um provedor de inteligência artificial (Google Gemini) para gerar a
+          resposta. Não envie dados pessoais, como documentos ou placas. Veja a{" "}
+          <Link href="/privacidade#assistente" className="text-foreground underline underline-offset-2">
+            Política de Privacidade
+          </Link>
+          .
+        </p>
+      </SectionContainer>
+    </PageShell>
   );
 }

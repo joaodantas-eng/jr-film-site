@@ -6,34 +6,56 @@ import { ReactNode } from "react";
 const container = {
   hidden: {},
   show: {
-    transition: { staggerChildren: 0.08 },
+    transition: { staggerChildren: 0.06 },
   },
 };
 
 const item = {
-  hidden: { opacity: 0, y: 16 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } },
+  hidden: { opacity: 0, y: 12 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.16, 1, 0.3, 1] } },
 };
 
+type ListTag = "div" | "ul" | "ol";
+type ItemTag = "div" | "li";
+
 // Anima uma lista (grid de cards) com stagger, sem repetir a config de transição em cada card.
-export function StaggerGroup({ children, className }: { children: ReactNode; className?: string }) {
+// `as` permite usar listas semânticas (ul/ol + li) sem perder a animação.
+export function StaggerGroup({
+  children,
+  className,
+  as = "div",
+}: {
+  children: ReactNode;
+  className?: string;
+  as?: ListTag;
+}) {
+  const Component = motion[as];
   return (
-    <motion.div
+    <Component
       variants={container}
       initial="hidden"
       whileInView="show"
-      viewport={{ once: true, margin: "-60px" }}
+      viewport={{ once: true, margin: "-40px" }}
       className={className}
     >
       {children}
-    </motion.div>
+    </Component>
   );
 }
 
-export function StaggerItem({ children, className }: { children: ReactNode; className?: string }) {
+export function StaggerItem({
+  children,
+  className,
+  as = "div",
+}: {
+  children: ReactNode;
+  className?: string;
+  as?: ItemTag;
+}) {
+  const Component = motion[as];
   return (
-    <motion.div variants={item} className={className}>
+    <Component variants={item} className={className}>
       {children}
-    </motion.div>
+    </Component>
   );
 }

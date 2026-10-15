@@ -3,7 +3,7 @@ interface QuickSuggestionsProps {
   disabled?: boolean;
 }
 
-const suggestions = [
+export const ASSISTANT_SUGGESTIONS = [
   "Meu ar-condicionado não gela",
   "Meu carro está puxando para um lado",
   "Meu freio faz barulho",
@@ -15,18 +15,19 @@ const suggestions = [
 
 export function QuickSuggestions({ onSelect, disabled }: QuickSuggestionsProps) {
   return (
-    <div className="flex flex-wrap gap-2">
-      {suggestions.map((suggestion) => (
-        <button
-          key={suggestion}
-          type="button"
-          disabled={disabled}
-          onClick={() => onSelect(suggestion)}
-          className="rounded-full border border-border bg-surface px-4 py-2 text-left text-sm text-foreground/85 transition-colors duration-200 hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {suggestion}
-        </button>
+    <ul className="grid gap-2 sm:grid-cols-2" aria-label="Exemplos de problemas para começar">
+      {ASSISTANT_SUGGESTIONS.map((suggestion) => (
+        <li key={suggestion}>
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={() => onSelect(suggestion)}
+            className="flex min-h-12 w-full items-center rounded-xl border border-border bg-surface px-4 py-2.5 text-left text-[0.9375rem] text-foreground/85 transition-colors duration-200 hover:border-border-strong hover:bg-surface-elevated hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {suggestion}
+          </button>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }

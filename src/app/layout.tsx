@@ -1,27 +1,22 @@
-import type { Metadata } from "next";
-import { Archivo, Inter, JetBrains_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Archivo } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/data/site";
-import { seoDefaults } from "@/config/seo";
-import { contactInfo } from "@/data/contact";
-import { socialLinks } from "@/data/social";
+import { robotsMetadata, seoDefaults } from "@/config/seo";
+import { buildBusinessJsonLd, buildWebsiteJsonLd } from "@/config/structuredData";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { MotionProvider } from "@/components/providers/MotionProvider";
+import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { Analytics } from "@vercel/analytics/react";
 
+// next/font hospeda a fonte junto do site (sem requisição ao Google no
+// navegador do visitante) e evita mudança de layout no carregamento.
+// Archivo variável com o eixo de largura (wdth): títulos largos, texto normal.
 const archivo = Archivo({
   subsets: ["latin"],
-  variable: "--font-display",
-  weight: ["500", "600", "700"],
-});
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-body",
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-  weight: ["400", "500"],
+  variable: "--font-archivo",
+  axes: ["wdth"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -31,9 +26,9 @@ export const metadata: Metadata = {
     template: seoDefaults.titleTemplate,
   },
   description: seoDefaults.defaultDescription,
-  keywords: seoDefaults.keywords,
-  robots: { index: true, follow: true },
-  alternates: { canonical: "/" },
+  applicationName: siteConfig.name,
+  robots: robotsMetadata,
+  formatDetection: { telephone: false },
   openGraph: {
     type: "website",
     locale: siteConfig.locale,
@@ -41,7 +36,7 @@ export const metadata: Metadata = {
     siteName: siteConfig.name,
     title: seoDefaults.defaultTitle,
     description: seoDefaults.defaultDescription,
-    images: [{ url: seoDefaults.ogImage, width: 1200, height: 630, alt: siteConfig.name }],
+    images: [{ url: seoDefaults.ogImage, width: 1200, height: 630, alt: siteConfig.legalName }],
   },
   twitter: {
     card: "summary_large_image",
@@ -51,47 +46,26 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "AutoRepair",
-    name: siteConfig.legalName,
-    description: siteConfig.description,
-    url: siteConfig.url,
-    telephone: contactInfo.phoneRaw,
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: contactInfo.address.street,
-      addressLocality: siteConfig.city,
-      addressRegion: siteConfig.state,
-      postalCode: contactInfo.address.zip,
-      addressCountry: "BR",
-    },
-    openingHoursSpecification: [
-      {
-        "@type": "OpeningHoursSpecification",
-        dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-        opens: "07:00",
-        closes: "17:30",
-      },
-      {
-        "@type": "OpeningHoursSpecification",
-        dayOfWeek: ["Saturday"],
-        opens: "08:00",
-        closes: "12:00",
-      },
-    ],
-    sameAs: socialLinks.map((social) => social.href),
-  };
+export const viewport: Viewport = {
+  themeColor: siteConfig.colors.background,
+  colorScheme: "dark",
+  // viewport-fit=cover permite usar as áreas seguras (env(safe-area-inset-*)) no iPhone.
+  viewportFit: "cover",
+  // No Android, o teclado redimensiona a página em vez de cobrir o campo do chat.
+  interactiveWidget: "resizes-content",
+};
 
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${archivo.variable} ${inter.variable} ${jetbrainsMono.variable}`}>
+    <html lang="pt-BR" className={archivo.variable}>
       <body className="font-body">
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-        {children}
+        <a href="#conteudo" className="skip-link">
+          Pular para o conteúdo
+        </a>
+        <JsonLd data={buildBusinessJsonLd()} />
+        <JsonLd data={buildWebsiteJsonLd()} />
+        <MotionProvider>{children}</MotionProvider>
+        <GoogleAnalytics />
         <Analytics />
       </body>
     </html>

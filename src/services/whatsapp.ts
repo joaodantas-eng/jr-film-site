@@ -8,5 +8,4 @@ export function buildWhatsAppLink(message?: string): string {
   return `${base}?text=${encodeURIComponent(message)}`;
 }
 
-export const defaultWhatsAppMessage =
-  "Olá! Vim pelo site e gostaria de agendar uma avaliação para o meu veículo.";
+export const defaultWhatsAppMessage = "Olá! Vim pelo site e gostaria de agendar uma avaliação para o meu veículo.";

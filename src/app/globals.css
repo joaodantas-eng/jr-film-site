@@ -9,26 +9,119 @@
 
   html {
     scroll-behavior: smooth;
+    /* Âncoras (#servicos, #contato) não ficam escondidas atrás do cabeçalho fixo */
+    scroll-padding-top: 5rem;
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background font-body text-foreground antialiased;
+    font-variation-settings: "wdth" 100;
+    font-feature-settings: "ss01", "tnum" 0;
+    /* Reserva espaço para a barra fixa de contato no celular (definida em ContactActions) */
+    padding-bottom: var(--mobile-bar-height, 0px);
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
   }
 
   ::selection {
-    @apply bg-accent/30 text-foreground;
+    @apply bg-accent text-white;
   }
 
   /* Foco visível para navegação por teclado — acessibilidade */
   :focus-visible {
-    outline: 2px solid #dc2626;
-    outline-offset: 2px;
+    outline: 2px solid #ff5a50;
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+}
+
+@layer components {
+  /* Títulos: Archivo larga e pesada — a "voz" da marca. */
+  .type-display {
+    @apply font-display font-extrabold;
+    font-variation-settings: "wdth" 118;
+  }
+
+  /* Rótulo curto acima de títulos, usado só onde informa algo (ex: local). */
+  .eyebrow {
+    @apply flex items-center gap-2.5 text-sm font-semibold text-foreground/70;
+  }
+  .eyebrow::before {
+    content: "";
+    @apply h-2 w-2 shrink-0 bg-accent;
+  }
+
+  /* Números (preços, horários) com algarismos de largura fixa. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Régua de precisão: marcas de medição usadas como detalhe gráfico. */
+  .ruler-x {
+    background-image:
+      repeating-linear-gradient(to right, rgba(243, 243, 241, 0.55) 0 1px, transparent 1px 40px),
+      repeating-linear-gradient(to right, rgba(243, 243, 241, 0.25) 0 1px, transparent 1px 8px);
+    background-size:
+      100% 12px,
+      100% 6px;
+    background-position:
+      0 100%,
+      0 100%;
+    background-repeat: no-repeat;
+  }
+  .ruler-y {
+    background-image:
+      repeating-linear-gradient(to bottom, rgba(243, 243, 241, 0.55) 0 1px, transparent 1px 40px),
+      repeating-linear-gradient(to bottom, rgba(243, 243, 241, 0.25) 0 1px, transparent 1px 8px);
+    background-size:
+      12px 100%,
+      6px 100%;
+    background-position:
+      100% 0,
+      100% 0;
+    background-repeat: no-repeat;
+  }
+
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-foreground focus:px-5 focus:py-3 focus:text-sm focus:font-semibold focus:text-background;
+  }
+
+  .prose-legal h2 {
+    @apply mb-3 mt-12 font-display text-xl font-bold text-foreground;
+  }
+  .prose-legal h3 {
+    @apply mb-2 mt-7 font-display text-base font-bold text-foreground;
+  }
+  .prose-legal p,
+  .prose-legal li {
+    @apply text-[1rem] leading-relaxed text-foreground/85;
+  }
+  .prose-legal p + p {
+    @apply mt-3;
+  }
+  .prose-legal ul {
+    @apply ml-5 list-disc space-y-2 marker:text-accent;
+  }
+  .prose-legal a {
+    @apply text-foreground underline decoration-accent decoration-2 underline-offset-4 hover:text-accent-fg;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;

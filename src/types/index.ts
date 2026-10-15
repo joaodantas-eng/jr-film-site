@@ -13,6 +13,8 @@ export interface Service {
   title: string;
   description: string;
   icon: LucideIconName;
+  // Agrupamento usado na listagem de serviços.
+  group: ServiceGroup;
   // Campos abaixo alimentam a página individual do serviço (app/servicos/[slug]).
   // Opcionais para não quebrar nenhum componente da V1 que só usa os campos básicos.
   metaDescription?: string;
@@ -23,6 +25,8 @@ export interface Service {
   process?: { title: string; description: string }[];
   faq?: FAQItem[];
 }
+
+export type ServiceGroup = "mecanica" | "pneus" | "estetica";
 
 export interface Differentiator {
   id: string;
@@ -38,6 +42,24 @@ export interface Testimonial {
   content: string;
   date: string;
   vehicle?: string;
+  // Origem verificável da avaliação. Avaliações vindas da API do Google
+  // preenchem tudo automaticamente; nas cadastradas à mão, preencha só se
+  // a origem tiver sido conferida.
+  source?: "Google";
+  authorUrl?: string;
+  relativeDate?: string;
+}
+
+// Trabalho realizado (case). Use apenas fotos e informações reais, com
+// autorização do cliente para publicar fotos do veículo.
+export interface CaseStudy {
+  id: string;
+  service: string;
+  vehicle?: string;
+  problem: string;
+  work: string;
+  images: { src: string; alt: string }[];
+  date?: string;
 }
 
 export interface GalleryItem {
@@ -71,23 +93,37 @@ export interface SocialLink {
   label: string;
   href: string;
   icon: LucideIconName;
+  isProfile: boolean;
+}
+
+export interface OpeningHours {
+  day: string;
+  time: string;
+  days: ("Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday")[];
+  opens?: string;
+  closes?: string;
 }
 
 export interface ContactInfo {
   phoneDisplay: string;
   phoneRaw: string;
+  phoneE164: string;
   whatsappNumber: string;
+  whatsappDisplay: string;
   address: {
     street: string;
     neighborhood: string;
     city: string;
     state: string;
     zip: string;
+    full: string;
   };
-  hours: { day: string; time: string }[];
+  hours: OpeningHours[];
   mapEmbedUrl: string;
+  mapSearchUrl: string;
   mapDirectionsUrl: string;
   googleReviewUrl: string;
+  googlePlaceId: string;
 }
 
 export type LucideIconName =
@@ -124,4 +160,5 @@ export type LucideIconName =
   | "Tag"
   | "BookOpen"
   | "ChevronDown"
-  | "Home";
+  | "Home"
+  | "Navigation";

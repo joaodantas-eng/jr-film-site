@@ -34,6 +34,7 @@ import {
   BookOpen,
   ChevronDown,
   Home,
+  Navigation,
   LucideProps,
 } from "lucide-react";
 
@@ -75,6 +76,7 @@ const iconMap: Record<LucideIconName, React.ComponentType<LucideProps>> = {
   BookOpen,
   ChevronDown,
   Home,
+  Navigation,
 };
 
 interface IconProps extends LucideProps {

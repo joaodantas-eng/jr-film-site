@@ -1,45 +1,83 @@
 "use client";
 
 import { AssistantAnswer, AssistantMessage } from "@/services/ai/types";
-import { ASSISTANT_ERROR_MESSAGE, ASSISTANT_IMAGE_ERROR_MESSAGE } from "@/services/ai/prompts/constants";
+import { AssistantErrorCode } from "@/services/ai/limits";
+import { ASSISTANT_ERROR_MESSAGES } from "@/services/ai/prompts/constants";
 
 // Único ponto de contato do navegador com a camada de IA. Nunca importa
 // assistant.ts, providers/ nem nada que leia GEMINI_API_KEY — só faz fetch
 // para a Route Handler, que roda no servidor. Usa multipart/form-data para
 // poder anexar a imagem junto da mensagem, na mesma requisição.
+
+const CLIENT_TIMEOUT_MS = 45_000;
+
+export class AssistantRequestError extends Error {
+  constructor(
+    public code: AssistantErrorCode | "network",
+    public retryAfterSeconds?: number,
+  ) {
+    super(ASSISTANT_ERROR_MESSAGES[code] ?? ASSISTANT_ERROR_MESSAGES.unavailable);
+    this.name = "AssistantRequestError";
+  }
+}
+
+// O servidor só aproveita texto e, no máximo, a foto mais recente do
+// histórico — enviar o resto seria peso inútil na requisição.
+function historyForRequest(history: AssistantMessage[]) {
+  let imageIncluded = false;
+  const trimmed = history
+    .filter((m) => m.id !== "welcome")
+    .slice(-10)
+    .reverse()
+    .map((m) => {
+      const content = m.role === "assistant" ? m.answer?.message || m.content : m.content;
+      const includeImage = m.role === "user" && m.image && !imageIncluded;
+      if (includeImage) imageIncluded = true;
+      return { role: m.role, content, ...(includeImage ? { image: m.image } : {}) };
+    })
+    .reverse();
+  return trimmed;
+}
+
 export async function requestAssistantAnswer(
   message: string,
   history: AssistantMessage[],
-  imageFile?: File | null,
+  imageFile?: Blob | null,
+  captchaToken?: string | null,
 ): Promise<AssistantAnswer> {
   const formData = new FormData();
   formData.set("message", message);
-  formData.set("history", JSON.stringify(history));
+  formData.set("history", JSON.stringify(historyForRequest(history)));
   if (imageFile) {
-    formData.set("image", imageFile);
+    formData.set("image", imageFile, "foto.jpg");
+  }
+  if (captchaToken) {
+    formData.set("captchaToken", captchaToken);
   }
 
   let response: Response;
   try {
-    response = await fetch("/api/assistant", { method: "POST", body: formData });
-  } catch {
-    throw new Error(imageFile ? ASSISTANT_IMAGE_ERROR_MESSAGE : ASSISTANT_ERROR_MESSAGE);
+    response = await fetch("/api/assistant", {
+      method: "POST",
+      body: formData,
+      signal: AbortSignal.timeout(CLIENT_TIMEOUT_MS),
+    });
+  } catch (error) {
+    const isTimeout = error instanceof DOMException && (error.name === "TimeoutError" || error.name === "AbortError");
+    throw new AssistantRequestError(isTimeout ? "timeout" : "network");
   }
 
   if (!response.ok) {
-    const data = await response.json().catch(() => null);
-    const detail = typeof data?.detail === "string" && data.detail ? data.detail : null;
-    if (detail) {
-      // Ajuda a depurar durante o desenvolvimento, só no console do navegador
-      // (devtools) — nunca aparece na tela do chat, mesmo em desenvolvimento.
-      console.error("[assistant] detalhe técnico do erro:", detail);
+    const data = (await response.json().catch(() => null)) as { error?: AssistantErrorCode; detail?: string } | null;
+    if (data?.detail) {
+      // Só existe fora de produção — ajuda a depurar pelo devtools, nunca vai para a tela.
+      console.error("[assistant] detalhe técnico do erro:", data.detail);
     }
-    // A tela do chat sempre recebe só a mensagem amigável — nunca texto
-    // técnico, stack trace ou código de erro. Falha com imagem tem uma
-    // mensagem própria, mais honesta sobre o que não funcionou.
-    throw new Error(imageFile ? ASSISTANT_IMAGE_ERROR_MESSAGE : ASSISTANT_ERROR_MESSAGE);
+    const retryAfter = Number(response.headers.get("Retry-After") ?? "") || undefined;
+    throw new AssistantRequestError(data?.error ?? "unavailable", retryAfter);
   }
 
-  const data = await response.json();
-  return data.answer as AssistantAnswer;
+  const data = (await response.json()) as { answer?: AssistantAnswer };
+  if (!data.answer || typeof data.answer.message !== "string") throw new AssistantRequestError("unavailable");
+  return data.answer;
 }

@@ -1,15 +1,11 @@
 import { cn } from "@/lib/utils";
 import { HTMLAttributes } from "react";
 
-interface SectionContainerProps extends HTMLAttributes<HTMLDivElement> {
-  as?: "div" | "section";
-}
-
-// Container padrão do site: largura máxima e padding horizontal consistentes.
-// Toda section usa este componente em vez de repetir "max-w-* mx-auto px-*" manualmente.
-export function SectionContainer({ className, children, ...props }: SectionContainerProps) {
+// Container padrão do site: largura máxima e padding horizontal consistentes
+// (20 px no celular, 32 px no tablet, 48 px no desktop).
+export function SectionContainer({ className, children, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn("mx-auto w-full max-w-container px-6 md:px-10", className)} {...props}>
+    <div className={cn("mx-auto w-full max-w-container px-5 sm:px-8 lg:px-12", className)} {...props}>
       {children}
     </div>
   );

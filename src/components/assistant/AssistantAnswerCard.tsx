@@ -3,16 +3,17 @@ import { ASSISTANT_WHATSAPP_CTA_LABEL, ASSISTANT_WARNING } from "@/services/ai/p
 import { WhatsAppButton } from "@/components/buttons/WhatsAppButton";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
-import { CheckCircle2 } from "lucide-react";
+import { AlertCircle, AlertTriangle, Info } from "lucide-react";
 
 interface AssistantAnswerCardProps {
   answer: AssistantAnswer;
 }
 
+// Nível de urgência: texto + ícone (não depende só da cor).
 const urgencyConfig = {
-  baixo: { label: "Urgência baixa", className: "border-border text-muted" },
-  medio: { label: "Urgência média", className: "border-accent/40 text-accent" },
-  alto: { label: "Urgência alta", className: "border-accent bg-accent text-white" },
+  baixo: { label: "Urgência baixa", className: "bg-foreground/10 text-foreground/85", icon: Info },
+  medio: { label: "Urgência média", className: "bg-amber-400/15 text-amber-200", icon: AlertCircle },
+  alto: { label: "Urgência alta", className: "bg-accent text-white", icon: AlertTriangle },
 };
 
 // Resposta em prosa, como um consultor conversando — sem títulos/seções fixas.
@@ -28,41 +29,43 @@ export function AssistantAnswerCard({ answer }: AssistantAnswerCardProps) {
   const urgency = answer.urgency ? urgencyConfig[answer.urgency] : null;
 
   return (
-    <div className="max-w-[85%] rounded-2xl rounded-bl-sm border border-border bg-surface p-5">
+    <div className="rounded-2xl rounded-tl-md bg-surface-elevated p-4 md:p-5">
       {urgency && (
         <span
           className={cn(
-            "mb-3 inline-block rounded-full border px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider",
+            "mb-3 inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-bold",
             urgency.className,
           )}
         >
+          <urgency.icon className="h-3.5 w-3.5" aria-hidden="true" />
           {urgency.label}
         </span>
       )}
 
-      <p className="whitespace-pre-line text-sm leading-relaxed text-foreground/90">{answer.message}</p>
+      <p className="whitespace-pre-line text-[0.975rem] leading-relaxed text-foreground/90">{answer.message}</p>
 
       {hasCauses && (
-        <ul className="mt-3 space-y-2">
-          {answer.possibleCauses.map((cause) => (
-            <li key={cause} className="flex items-start gap-2.5 text-sm text-foreground/85">
-              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-              {cause}
-            </li>
-          ))}
-        </ul>
+        <div className="mt-4 rounded-xl border border-border bg-surface p-4">
+          <p className="text-sm font-bold text-foreground">Possíveis causas</p>
+          <ul className="mt-2.5 space-y-2">
+            {answer.possibleCauses.map((cause) => (
+              <li key={cause} className="flex items-start gap-2.5 text-[0.9375rem] text-foreground/85">
+                <span aria-hidden="true" className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+                {cause}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
 
-      {!answer.offTopic && (
-        <p className="mt-3 text-xs leading-relaxed text-muted">{ASSISTANT_WARNING}</p>
-      )}
+      {!answer.offTopic && <p className="mt-3 text-sm leading-relaxed text-muted">{ASSISTANT_WARNING}</p>}
 
       {!answer.offTopic && (
-        <div className="mt-4 flex flex-wrap gap-3">
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
           <WhatsAppButton size="md" label={ASSISTANT_WHATSAPP_CTA_LABEL} message={whatsappMessage} />
           {answer.relatedServiceSlug && (
             <Button href={`/servicos/${answer.relatedServiceSlug}`} variant="secondary" size="md">
-              Ver serviço relacionado
+              Consultar o serviço relacionado
             </Button>
           )}
         </div>

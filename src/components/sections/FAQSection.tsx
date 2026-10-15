@@ -2,27 +2,24 @@ import { generalFaq } from "@/data/faq";
 import { SectionContainer } from "@/components/ui/SectionContainer";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { Accordion } from "@/components/ui/Accordion";
-import { Reveal } from "@/components/animations/Reveal";
+import { WhatsAppButton } from "@/components/buttons/WhatsAppButton";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildFaqJsonLd } from "@/config/structuredData";
 
 export function FAQSection() {
-  const faqJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: generalFaq.map((item) => ({
-      "@type": "Question",
-      name: item.question,
-      acceptedAnswer: { "@type": "Answer", text: item.answer },
-    })),
-  };
-
   return (
-    <section id="faq" className="border-y border-border bg-surface/40 py-24 md:py-32">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
-      <SectionContainer className="mx-auto max-w-3xl">
-        <SectionTitle eyebrow="Dúvidas" title="Perguntas frequentes." align="center" className="mx-auto" />
-        <Reveal className="mt-12">
-          <Accordion items={generalFaq} />
-        </Reveal>
+    <section id="faq" aria-labelledby="faq-titulo" className="border-t border-border py-20 md:py-28">
+      <JsonLd data={buildFaqJsonLd(generalFaq)} />
+      <SectionContainer className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
+        <div className="lg:sticky lg:top-28 lg:self-start">
+          <SectionTitle
+            id="faq-titulo"
+            title="Perguntas frequentes."
+            description="Não encontrou sua dúvida? A equipe responde pelo WhatsApp."
+          />
+          <WhatsAppButton variant="secondary" label="Perguntar no WhatsApp" className="mt-8" />
+        </div>
+        <Accordion items={generalFaq} />
       </SectionContainer>
     </section>
   );

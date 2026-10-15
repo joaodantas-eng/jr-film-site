@@ -1,74 +1,92 @@
 "use client";
 
 import { mainNav } from "@/data/navigation";
+import { siteConfig } from "@/data/site";
 import { contactInfo } from "@/data/contact";
 import { NavLinks } from "@/components/navigation/NavLinks";
 import { MobileMenu } from "@/components/navigation/MobileMenu";
 import { WhatsAppButton } from "@/components/buttons/WhatsAppButton";
 import { Logo } from "@/components/ui/Logo";
 import { useActiveSection } from "@/hooks/useActiveSection";
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Menu, Phone } from "lucide-react";
 import Link from "next/link";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const activeId = useActiveSection(
-    mainNav
-      .filter((l) => l.href.includes("#"))
-      .map((l) => l.href.split("#")[1])
-      .filter((fragment): fragment is string => Boolean(fragment)),
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const sectionIds = useMemo(
+    () =>
+      mainNav
+        .filter((l) => l.href.includes("#"))
+        .map((l) => l.href.split("#")[1])
+        .filter((fragment): fragment is string => Boolean(fragment)),
+    [],
   );
+  const activeId = useActiveSection(sectionIds);
 
   useEffect(() => {
     function onScroll() {
       setScrolled(window.scrollY > 24);
     }
-    window.addEventListener("scroll", onScroll);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  function closeMenu() {
+    setMobileOpen(false);
+    menuButtonRef.current?.focus();
+  }
+
+  // O menu mobile fica FORA do <header>: o backdrop-blur do cabeçalho cria um
+  // novo contexto para elementos "fixed", o que prenderia o menu à altura dele.
   return (
-    <motion.header
-      initial={{ y: -80 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      className={`fixed inset-x-0 top-0 z-30 transition-colors duration-300 ${
-        scrolled ? "border-b border-border bg-background/90 backdrop-blur-md" : "bg-transparent"
-      }`}
-    >
-      <div className="mx-auto flex h-20 max-w-container items-center justify-between px-6 md:px-10">
-        <Link href="/" aria-label={`${contactInfo.address.city} — Página inicial`}>
-          <Logo variant="dark-bg" height={30} />
-        </Link>
+    <>
+      <header
+        data-track-location="cabecalho"
+        className={`fixed inset-x-0 top-0 z-40 transition-colors duration-300 ${
+          scrolled || mobileOpen
+            ? "border-b border-border bg-background/90 backdrop-blur-md backdrop-saturate-150"
+            : "border-b border-transparent bg-transparent"
+        }`}
+      >
+        <div className="mx-auto flex h-16 max-w-container items-center justify-between gap-6 px-5 sm:px-8 lg:h-[4.5rem] lg:px-12">
+          <Link href="/" aria-label={`${siteConfig.name} — página inicial`} className="shrink-0 rounded-md">
+            <Logo variant="dark-bg" height={26} />
+          </Link>
 
-        <nav className="hidden items-center gap-6 md:flex">
-          <NavLinks links={mainNav} activeId={activeId} />
-        </nav>
+          <nav aria-label="Principal" className="hidden items-center gap-7 lg:flex">
+            <NavLinks links={mainNav} activeId={activeId} />
+          </nav>
 
-        <div className="hidden items-center gap-5 md:flex">
-          <a
-            href={`tel:${contactInfo.phoneRaw}`}
-            className="hidden items-center gap-2 text-sm text-foreground/80 transition-colors hover:text-foreground lg:flex"
+          <div className="hidden items-center gap-5 lg:flex">
+            <a
+              href={`tel:${contactInfo.phoneRaw}`}
+              className="hidden items-center gap-2 text-sm text-foreground/80 transition-colors hover:text-foreground xl:flex"
+            >
+              <Phone className="h-4 w-4 text-accent-fg" strokeWidth={1.75} aria-hidden="true" />
+              <span className="sr-only">Ligar para a JR Film:</span>
+              {contactInfo.phoneDisplay}
+            </a>
+            <WhatsAppButton size="md" label="WhatsApp" className="min-h-10 px-4" />
+          </div>
+
+          <button
+            ref={menuButtonRef}
+            type="button"
+            onClick={() => setMobileOpen(true)}
+            aria-label="Abrir menu"
+            aria-expanded={mobileOpen}
+            aria-controls="menu-mobile"
+            className="-mr-2 flex h-11 w-11 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-foreground/10 lg:hidden"
           >
-            <Phone className="h-4 w-4 text-accent" strokeWidth={1.75} />
-            {contactInfo.phoneDisplay}
-          </a>
-          <WhatsAppButton size="md" />
+            <Menu className="h-6 w-6" aria-hidden="true" />
+          </button>
         </div>
-
-        <button
-          onClick={() => setMobileOpen(true)}
-          aria-label="Abrir menu"
-          className="p-2 text-foreground md:hidden"
-        >
-          <Menu className="h-6 w-6" />
-        </button>
-      </div>
-
-      <MobileMenu open={mobileOpen} onClose={() => setMobileOpen(false)} links={mainNav} />
-    </motion.header>
+      </header>
+      <MobileMenu open={mobileOpen} onClose={closeMenu} links={mainNav} />
+    </>
   );
 }

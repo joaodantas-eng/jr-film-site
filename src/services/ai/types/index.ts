@@ -18,6 +18,7 @@ export interface AssistantMessage {
   role: "user" | "assistant";
   content: string; // texto simples (usado por mensagens do usuário e pela saudação inicial)
   image?: ImageAttachment; // presente quando o usuário anexou uma foto a esta mensagem
+  imageOmitted?: boolean; // a foto existia, mas não foi mantida ao restaurar a conversa da aba
   answer?: AssistantAnswer; // presente quando a resposta do assistente é estruturada
   createdAt: number;
 }

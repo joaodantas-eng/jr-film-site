@@ -1,35 +1,22 @@
-import TextRevealBlur from "@/components/animations/TextRevealBlur";
+import { AssistantAvatar } from "./AssistantAvatar";
 
 interface LoadingIndicatorProps {
   label?: string;
 }
 
-// Indicador de "digitando" — o texto é revelado por um blob que "escreve" a
-// frase, no lugar dos três pontinhos genéricos. Label configurável para ser
-// reaproveitado tanto no chat de texto quanto na análise de foto.
-export function LoadingIndicator({ label = "Assistente digitando..." }: LoadingIndicatorProps) {
+// "Escrevendo…": texto explícito para leitores de tela e três pontos como
+// reforço visual (param com prefers-reduced-motion pela regra global).
+export function LoadingIndicator({ label = "Escrevendo a resposta…" }: LoadingIndicatorProps) {
   return (
-    <div className="flex items-center rounded-2xl rounded-bl-sm border border-border bg-surface px-4 py-3">
-      <div className="h-6 w-56">
-        <TextRevealBlur
-          prefix=""
-          texts={[label]}
-          font={{
-            fontFamily: "var(--font-mono, monospace)",
-            fontSize: "12px",
-            fontWeight: 500,
-            letterSpacing: "0.05em",
-            lineHeight: "1.2em",
-            textAlign: "left",
-            textTransform: "uppercase",
-          }}
-          color="#8A8A8A"
-          wipeColor="#EF4444"
-          revealColor="#DC2626"
-          blobSize={7}
-          blur={6}
-          transition={{ delay: 1.2 }}
-        />
+    <div role="status" className="flex items-start gap-3">
+      <AssistantAvatar className="mt-0.5" />
+      <div className="inline-flex items-center gap-3 rounded-2xl rounded-tl-md bg-surface-elevated px-4 py-3">
+        <span className="flex gap-1" aria-hidden="true">
+          <span className="h-1.5 w-1.5 animate-dot-pulse rounded-full bg-foreground" />
+          <span className="h-1.5 w-1.5 animate-dot-pulse rounded-full bg-foreground [animation-delay:0.15s]" />
+          <span className="h-1.5 w-1.5 animate-dot-pulse rounded-full bg-foreground [animation-delay:0.3s]" />
+        </span>
+        <span className="text-sm text-foreground/75">{label}</span>
       </div>
     </div>
   );
